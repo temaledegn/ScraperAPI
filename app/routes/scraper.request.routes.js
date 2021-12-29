@@ -32,6 +32,9 @@ module.exports = function (app) {
   app.post("/scraping/telegram/group/delete", [cors(), authJwt.verifyToken, authJwt.isAdmin], controller.tgGroupDelete);
 
 
-
+  app.get("/scraping/linkedin/get", [cors(), authJwt.verifyToken, authJwt.isAdmin], controller.linkedinGet);
+  app.post("/scraping/linkedin/add", [cors(), authJwt.verifyToken, authJwt.isAdmin], controller.linkedinAdd);
+  app.post("/scraping/linkedin/delete", [cors(), authJwt.verifyToken, authJwt.isAdmin], controller.linkedinDelete);
+  
 }
 

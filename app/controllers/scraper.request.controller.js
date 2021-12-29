@@ -8,6 +8,7 @@ const telegramPath = homeDir + '/Desktop/OSINT/Telegram/data.json'
 const fbPagePath = homeDir + '/Desktop/OSINT/facebook/faceboook-scraper-backend/target.txt'
 const fbUserPath = homeDir + '/Desktop/OSINT/facebook/facebook-scraper-backend-profile/target.txt'
 const twitterPath = homeDir + '/Desktop/OSINT/Twitter/twitterScraper/Authentication/Document.txt'
+const linkedinPath = homeDir + '/Desktop/OSINT/linkedin/datarequ.txt'
 
 //*************** FACEBOOK  ******************/
 
@@ -34,7 +35,7 @@ exports.fbUserAdd = (req, res) => {
             fs.appendFile(fbUserPath, '\n' + link, function (err) {
                 if (err) {
                     res.send({ 'type': 'error', 'message': 'cant append' })
-                } else {``
+                } else {
                     res.send({ 'type': 'success', 'message': 'appended' })
                 }
             });
@@ -307,3 +308,66 @@ exports.tgGroupDelete = (req, res) => {
 
 
 //*************** END TELEGRAM  ******************/
+
+
+//***************** LINKEDIN  ********************/
+
+
+exports.linkedinGet = (req, res) => {
+    fs.readFile(linkedinPath, 'utf8', (err, data) => {
+        if (err) {
+            res.send([])
+        }
+        res.send(data.split('\n'));
+    });
+}
+
+exports.linkedinAdd = (req, res) => {
+    let link = req.body.link;
+
+    fs.readFile(linkedinPath, 'utf8', (err, data) => {
+        if (err) {
+            res.send({ 'type': 'error', 'message': 'cant read' })
+        }
+        let links = data.split('\n');
+        if (links.includes(link)) {
+            res.send({ 'type': 'warning', 'message': 'already added' })
+        } else {
+            fs.appendFile(linkedinPath, '\n' + link, function (err) {
+                if (err) {
+                    res.send({ 'type': 'error', 'message': 'cant append' })
+                } else {
+                    res.send({ 'type': 'success', 'message': 'appended' })
+                }
+            });
+        }
+    });
+}
+
+exports.linkedinDelete = (req, res) => {
+    let link = req.body.link;
+
+    fs.readFile(linkedinPath, 'utf8', (err, data) => {
+        if (err) {
+            res.send({ 'type': 'error', 'message': 'cant read' })
+        }
+        let links = data.split('\n');
+        if (links.includes(link)) {
+            const index = links.indexOf(link);
+            if (index > -1) {
+                links.splice(index, 1);
+            }
+            fs.writeFile(linkedinPath, links.join('\n'), function (err) {
+                if (err) {
+                    res.send({ 'type': 'error', 'message': 'cant delete' });
+                }
+                res.send({ 'type': 'success', 'message': 'link removed' });
+            });
+        } else {
+            res.send({ 'type': 'warning', 'message': 'link not found' });
+        }
+    });
+}
+
+
+//*************** END LINKEDIN  ******************/
