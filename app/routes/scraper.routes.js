@@ -42,7 +42,18 @@ module.exports = function (app) {
   /* ************************************* */
 
   app.get("/linkedin/all-scraped/", [cors(), authJwt.verifyToken, authJwt.isAdmin], controller.linkedinAllScraped);
+  
+  
+  /* ************************************* */
+  /* **********   YOUTUBE     *********** */
+  /* ************************************* */
+  app.get("/youtube/all-videos/", [cors(), authJwt.verifyToken, authJwt.isAdmin], controller.youtubeAllVideos);
 
+
+  app.get("/youtube/comments/:doc_id", [cors(), authJwt.verifyToken, authJwt.isAdmin], controller.youtubeComments);
+
+
+  // app.get("/youtube/search/", [cors(), authJwt.verifyToken, authJwt.isAdmin], controller.youtubeSearch);
 }
 
 

@@ -255,3 +255,131 @@ exports.linkedinAllScraped = (req, res) => {
 /* ************************************* */
 /* *********  END LINKEDIN      ******** */
 /* ************************************* */
+
+
+
+
+/* ************************************* */
+/* **********   YOUTUBE      *********** */
+/* ************************************* */
+
+exports.youtubeAllVideos = (req, res) => {
+    MongoClient.connect(uri, function (err, db) {
+        if (err) throw err;
+        var dbo = db.db("youtube-data");
+        dbo
+            .collection("youtube")
+            .find({}, { projection: { 'post.comment': 0, comment:0 } })
+            .toArray()
+            .then((items) => {
+                res.send(items);
+                db.close();
+            });
+    });
+}
+
+exports.youtubeComments = (req, res) => {
+    MongoClient.connect(uri, function (err, db) {
+        if (err) throw err;
+        var dbo = db.db("youtube-data");
+        dbo
+            .collection("youtube")
+            .findOne(
+                { _id: req.params.doc_id},
+                { projection: { "post.comment" : 1 } },
+                function (err, result) {
+                    if (err) throw err;
+                    res.send(result);
+                    db.close();
+                }
+            );
+    });
+}
+
+// exports.youtubeSearch = (req, res) => {
+//     const sq = req.query.q;
+//     if (sq[0] === '"' && sq[sq.length - 1] === '"') {
+//         let re = new RegExp(".*" + sq.substring(1, sq.length - 1) + ".*", "i");
+//         MongoClient.connect(uri, function (err, db) {
+//             if (err) throw err;
+//             var dbo = db.db("twitter-data");
+//             dbo
+//                 .collection("twitter")
+//                 .aggregate([
+//                     {
+//                         $project: {
+//                             tweets: {
+//                                 $filter: {
+//                                     input: "$tweets",
+//                                     as: "tweets",
+//                                     cond: {
+//                                         $regexMatch: {
+//                                             input: "$$tweets.tweet",
+//                                             regex: re,
+//                                         },
+//                                     },
+//                                 },
+//                             },
+//                             // Fullname: 1,
+//                             // UserName: 1,
+//                         },
+//                     },
+//                 ])
+//                 .toArray()
+//                 .then((items) => {
+//                     res.send(items);
+//                     db.close();
+//                 });
+//         });
+//     } else if (sq.startsWith("@")) {
+//         MongoClient.connect(uri, function (err, db) {
+//             if (err) throw err;
+//             var dbo = db.db("twitter-data");
+//             dbo
+//                 .collection("twitter")
+//                 .findOne({ UserName: sq },
+//                     function (err, result) {
+//                         if (err) throw err;
+//                         res.send([result]);
+//                         db.close();
+//                     });
+//         });
+//     } else {
+//         let re = new RegExp(".*" + sq + ".*", "i");
+//         MongoClient.connect(uri, function (err, db) {
+//             if (err) throw err;
+//             var dbo = db.db("twitter-data");
+//             dbo
+//                 .collection("twitter")
+//                 .aggregate([
+//                     {
+//                         $project: {
+//                             tweets: {
+//                                 $filter: {
+//                                     input: "$tweets",
+//                                     as: "tweets",
+//                                     cond: {
+//                                         $regexMatch: {
+//                                             input: "$$tweets.tweet",
+//                                             regex: re,
+//                                         },
+//                                     },
+//                                 },
+//                             },
+//                             // Fullname: 1,
+//                             // UserName: 1,
+//                         },
+//                     },
+//                 ])
+//                 .toArray()
+//                 .then((items) => {
+//                     res.send(items);
+//                     db.close();
+//                 });
+//         });
+//     }
+// };
+
+/* ************************************* */
+/* *********  END YOUTUBE      ********* */
+/* ************************************* */
