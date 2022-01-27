@@ -9,6 +9,7 @@ const fbPagePath = homeDir + '/Desktop/OSINT/facebook/faceboook-scraper-backend/
 const fbUserPath = homeDir + '/Desktop/OSINT/facebook/facebook-scraper-backend-profile/target.txt'
 const twitterPath = homeDir + '/Desktop/OSINT/Twitter/twitterScraper/Authentication/Document.txt'
 const linkedinPath = homeDir + '/Desktop/OSINT/linkedin/datarequ.txt'
+const youtubePath = homeDir + '/Desktop/OSINT/youtube/url.txt'
 
 //*************** FACEBOOK  ******************/
 
@@ -416,3 +417,72 @@ exports.linkedinDelete = (req, res) => {
 
 
 //*************** END LINKEDIN  ******************/
+
+
+//***************** YOUTUBE  ********************/
+
+
+exports.youtubeGet = (req, res) => {
+    fs.readFile(youtubePath, 'utf8', (err, data) => {
+        if (err) {
+            res.send([])
+        } else {
+            res.send(data.split('\n'));
+        }
+
+    });
+}
+
+exports.youtubeAdd = (req, res) => {
+    let link = req.body.link;
+
+    fs.readFile(youtubePath, 'utf8', (err, data) => {
+        if (err) {
+            res.send({ 'type': 'error', 'message': 'cant read' })
+        } else {
+            let links = data.split('\n');
+            if (links.includes(link)) {
+                res.send({ 'type': 'warning', 'message': 'already added' })
+            } else {
+                fs.appendFile(youtubePath, '\n' + link, function (err) {
+                    if (err) {
+                        res.send({ 'type': 'error', 'message': 'cant append' })
+                    } else {
+                        res.send({ 'type': 'success', 'message': 'appended' })
+                    }
+                });
+            }
+        }
+
+    });
+}
+
+exports.youtubeDelete = (req, res) => {
+    let link = req.body.link;
+
+    fs.readFile(youtubePath, 'utf8', (err, data) => {
+        if (err) {
+            res.send({ 'type': 'error', 'message': 'cant read' })
+        } else {
+            let links = data.split('\n');
+            if (links.includes(link)) {
+                const index = links.indexOf(link);
+                if (index > -1) {
+                    links.splice(index, 1);
+                }
+                fs.writeFile(youtubePath, links.join('\n'), function (err) {
+                    if (err) {
+                        res.send({ 'type': 'error', 'message': 'cant delete' });
+                    }
+                    res.send({ 'type': 'success', 'message': 'link removed' });
+                });
+            } else {
+                res.send({ 'type': 'warning', 'message': 'link not found' });
+            }
+        }
+
+    });
+}
+
+
+//*************** END YOUTUBE  ******************/

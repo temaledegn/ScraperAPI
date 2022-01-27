@@ -35,6 +35,12 @@ module.exports = function (app) {
   app.get("/scraping/linkedin/get", [cors(), authJwt.verifyToken, authJwt.isAdmin], controller.linkedinGet);
   app.post("/scraping/linkedin/add", [cors(), authJwt.verifyToken, authJwt.isAdmin], controller.linkedinAdd);
   app.post("/scraping/linkedin/delete", [cors(), authJwt.verifyToken, authJwt.isAdmin], controller.linkedinDelete);
-  
+
+
+
+  app.get("/scraping/youtube/get", [cors(), authJwt.verifyToken, authJwt.isAdmin], controller.youtubeGet);
+  app.post("/scraping/youtube/add", [cors(), authJwt.verifyToken, authJwt.isAdmin], controller.youtubeAdd);
+  app.post("/scraping/youtube/delete", [cors(), authJwt.verifyToken, authJwt.isAdmin], controller.youtubeDelete);
+
 }
 
