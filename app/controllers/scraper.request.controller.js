@@ -16,8 +16,10 @@ exports.fbUserGet = (req, res) => {
     fs.readFile(fbUserPath, 'utf8', (err, data) => {
         if (err) {
             res.send([])
+        } else {
+            res.send(data.split('\n'));
         }
-        res.send(data.split('\n'));
+
     });
 }
 
@@ -27,19 +29,21 @@ exports.fbUserAdd = (req, res) => {
     fs.readFile(fbUserPath, 'utf8', (err, data) => {
         if (err) {
             res.send({ 'type': 'error', 'message': 'cant read' })
-        }
-        let links = data.split('\n');
-        if (links.includes(link)) {
-            res.send({ 'type': 'warning', 'message': 'already added' })
         } else {
-            fs.appendFile(fbUserPath, '\n' + link, function (err) {
-                if (err) {
-                    res.send({ 'type': 'error', 'message': 'cant append' })
-                } else {
-                    res.send({ 'type': 'success', 'message': 'appended' })
-                }
-            });
+            let links = data.split('\n');
+            if (links.includes(link)) {
+                res.send({ 'type': 'warning', 'message': 'already added' })
+            } else {
+                fs.appendFile(fbUserPath, '\n' + link, function (err) {
+                    if (err) {
+                        res.send({ 'type': 'error', 'message': 'cant append' })
+                    } else {
+                        res.send({ 'type': 'success', 'message': 'appended' })
+                    }
+                });
+            }
         }
+
     });
 }
 
@@ -49,22 +53,26 @@ exports.fbUserDelete = (req, res) => {
     fs.readFile(fbUserPath, 'utf8', (err, data) => {
         if (err) {
             res.send({ 'type': 'error', 'message': 'cant read' })
-        }
-        let links = data.split('\n');
-        if (links.includes(link)) {
-            const index = links.indexOf(link);
-            if (index > -1) {
-                links.splice(index, 1);
-            }
-            fs.writeFile(fbUserPath, links.join('\n'), function (err) {
-                if (err) {
-                    res.send({ 'type': 'error', 'message': 'cant delete' });
-                }
-                res.send({ 'type': 'success', 'message': 'link removed' });
-            });
         } else {
-            res.send({ 'type': 'warning', 'message': 'link not found' });
+            let links = data.split('\n');
+            if (links.includes(link)) {
+                const index = links.indexOf(link);
+                if (index > -1) {
+                    links.splice(index, 1);
+                }
+                fs.writeFile(fbUserPath, links.join('\n'), function (err) {
+                    if (err) {
+                        res.send({ 'type': 'error', 'message': 'cant delete' });
+                    } else {
+                        res.send({ 'type': 'success', 'message': 'link removed' });
+                    }
+
+                });
+            } else {
+                res.send({ 'type': 'warning', 'message': 'link not found' });
+            }
         }
+
     });
 }
 
@@ -73,8 +81,10 @@ exports.fbPageGet = (req, res) => {
     fs.readFile(fbPagePath, 'utf8', (err, data) => {
         if (err) {
             res.send([])
+        } else {
+
+            res.send(data.split('\n'));
         }
-        res.send(data.split('\n'));
     });
 }
 
@@ -85,19 +95,21 @@ exports.fbPageAdd = (req, res) => {
     fs.readFile(fbPagePath, 'utf8', (err, data) => {
         if (err) {
             res.send({ 'type': 'error', 'message': 'cant read' })
-        }
-        let links = data.split('\n');
-        if (links.includes(link)) {
-            res.send({ 'type': 'warning', 'message': 'already added' })
         } else {
-            fs.appendFile(fbPagePath, '\n' + link, function (err) {
-                if (err) {
-                    res.send({ 'type': 'error', 'message': 'cant append' })
-                } else {
-                    res.send({ 'type': 'success', 'message': 'Link Added' })
-                }
-            });
+            let links = data.split('\n');
+            if (links.includes(link)) {
+                res.send({ 'type': 'warning', 'message': 'already added' })
+            } else {
+                fs.appendFile(fbPagePath, '\n' + link, function (err) {
+                    if (err) {
+                        res.send({ 'type': 'error', 'message': 'cant append' })
+                    } else {
+                        res.send({ 'type': 'success', 'message': 'Link Added' })
+                    }
+                });
+            }
         }
+
     });
 }
 
@@ -107,22 +119,26 @@ exports.fbPageDelete = (req, res) => {
     fs.readFile(fbPagePath, 'utf8', (err, data) => {
         if (err) {
             res.send({ 'type': 'error', 'message': 'cant read' })
-        }
-        let links = data.split('\n');
-        if (links.includes(link)) {
-            const index = links.indexOf(link);
-            if (index > -1) {
-                links.splice(index, 1);
-            }
-            fs.writeFile(fbPagePath, links.join('\n'), function (err) {
-                if (err) {
-                    res.send({ 'type': 'error', 'message': 'cant delete' });
-                }
-                res.send({ 'type': 'success', 'message': 'link removed' });
-            });
         } else {
-            res.send({ 'type': 'warning', 'message': 'link not found' });
+            let links = data.split('\n');
+            if (links.includes(link)) {
+                const index = links.indexOf(link);
+                if (index > -1) {
+                    links.splice(index, 1);
+                }
+                fs.writeFile(fbPagePath, links.join('\n'), function (err) {
+                    if (err) {
+                        res.send({ 'type': 'error', 'message': 'cant delete' });
+                    } else {
+                        res.send({ 'type': 'success', 'message': 'link removed' });
+                    }
+
+                });
+            } else {
+                res.send({ 'type': 'warning', 'message': 'link not found' });
+            }
         }
+
     });
 }
 
@@ -137,8 +153,10 @@ exports.twitterGet = (req, res) => {
     fs.readFile(twitterPath, 'utf8', (err, data) => {
         if (err) {
             res.send([])
+        } else {
+            res.send(data.split('\n'));
         }
-        res.send(data.split('\n'));
+
     });
 }
 
@@ -149,18 +167,20 @@ exports.twitterAdd = (req, res) => {
     fs.readFile(twitterPath, 'utf8', (err, data) => {
         if (err) {
             res.send({ 'type': 'error', 'message': 'cant read' })
-        }
-        let usernames = data.split('\n');
-        if (usernames.includes(username)) {
-            res.send({ 'type': 'warning', 'message': 'already added' })
         } else {
-            fs.appendFile(twitterPath, '\n' + username, function (err) {
-                if (err) {
-                    res.send({ 'type': 'error', 'message': 'cant append' })
-                } else {
-                    res.send({ 'type': 'success', 'message': 'Username Added' })
-                }
-            });
+
+            let usernames = data.split('\n');
+            if (usernames.includes(username)) {
+                res.send({ 'type': 'warning', 'message': 'already added' })
+            } else {
+                fs.appendFile(twitterPath, '\n' + username, function (err) {
+                    if (err) {
+                        res.send({ 'type': 'error', 'message': 'cant append' })
+                    } else {
+                        res.send({ 'type': 'success', 'message': 'Username Added' })
+                    }
+                });
+            }
         }
     });
 }
@@ -171,22 +191,26 @@ exports.twitterDelete = (req, res) => {
     fs.readFile(twitterPath, 'utf8', (err, data) => {
         if (err) {
             res.send({ 'type': 'error', 'message': 'cant read' })
-        }
-        let usernames = data.split('\n');
-        if (usernames.includes(username)) {
-            const index = usernames.indexOf(username);
-            if (index > -1) {
-                usernames.splice(index, 1);
-            }
-            fs.writeFile(twitterPath, usernames.join('\n'), function (err) {
-                if (err) {
-                    res.send({ 'type': 'error', 'message': 'cant delete' });
-                }
-                res.send({ 'type': 'success', 'message': 'username removed' });
-            });
         } else {
-            res.send({ 'type': 'error', 'message': 'username not found' });
+            let usernames = data.split('\n');
+            if (usernames.includes(username)) {
+                const index = usernames.indexOf(username);
+                if (index > -1) {
+                    usernames.splice(index, 1);
+                }
+                fs.writeFile(twitterPath, usernames.join('\n'), function (err) {
+                    if (err) {
+                        res.send({ 'type': 'error', 'message': 'cant delete' });
+                    } else {
+                        res.send({ 'type': 'success', 'message': 'username removed' });
+                    }
+
+                });
+            } else {
+                res.send({ 'type': 'error', 'message': 'username not found' });
+            }
         }
+
     });
 }
 
@@ -199,8 +223,10 @@ exports.tgGet = (req, res) => {
     fs.readFile(telegramPath, 'utf8', (err, data) => {
         if (err) {
             res.send({ 'type': 'error', })
+        } else {
+            res.send(JSON.parse(data));
         }
-        res.send(JSON.parse(data));
+
     });
 }
 
@@ -211,19 +237,23 @@ exports.tgChannelAdd = (req, res) => {
     fs.readFile(telegramPath, 'utf8', (err, data) => {
         if (err) {
             res.send({ 'type': 'error', 'message': 'cant read' })
-        }
-        let usernames = JSON.parse(data);
-        if (usernames.channel_username.includes(username)) {
-            res.send({ 'type': 'warning', 'message': 'already added' });
         } else {
-            usernames.channel_username.push(username);
-            fs.writeFile(telegramPath, JSON.stringify(usernames), function (err) {
-                if (err) {
-                    res.send({ 'type': 'error', 'message': 'cant add' });
-                }
-                res.send({ 'type': 'success', 'message': 'username added' });
-            });
+            let usernames = JSON.parse(data);
+            if (usernames.channel_username.includes(username)) {
+                res.send({ 'type': 'warning', 'message': 'already added' });
+            } else {
+                usernames.channel_username.push(username);
+                fs.writeFile(telegramPath, JSON.stringify(usernames), function (err) {
+                    if (err) {
+                        res.send({ 'type': 'error', 'message': 'cant add' });
+                    } else {
+                        res.send({ 'type': 'success', 'message': 'username added' });
+                    }
+
+                });
+            }
         }
+
     });
 }
 
@@ -234,22 +264,26 @@ exports.tgChannelDelete = (req, res) => {
     fs.readFile(telegramPath, 'utf8', (err, data) => {
         if (err) {
             res.send({ 'type': 'error', 'message': 'cant read' })
-        }
-        let usernames = JSON.parse(data);
-        if (usernames.channel_username.includes(username)) {
-            const index = usernames.channel_username.indexOf(username);
-            if (index > -1) {
-                usernames.channel_username.splice(index, 1);
-            }
-            fs.writeFile(telegramPath, JSON.stringify(usernames), function (err) {
-                if (err) {
-                    res.send({ 'type': 'error', 'message': 'cant delete' });
-                }
-                res.send({ 'type': 'success', 'message': 'username removed' });
-            });
         } else {
-            res.send({ 'type': 'error', 'message': 'username not found' });
+            let usernames = JSON.parse(data);
+            if (usernames.channel_username.includes(username)) {
+                const index = usernames.channel_username.indexOf(username);
+                if (index > -1) {
+                    usernames.channel_username.splice(index, 1);
+                }
+                fs.writeFile(telegramPath, JSON.stringify(usernames), function (err) {
+                    if (err) {
+                        res.send({ 'type': 'error', 'message': 'cant delete' });
+                    } else {
+                        res.send({ 'type': 'success', 'message': 'username removed' });
+                    }
+
+                });
+            } else {
+                res.send({ 'type': 'error', 'message': 'username not found' });
+            }
         }
+
     });
 }
 
@@ -261,19 +295,22 @@ exports.tgGroupAdd = (req, res) => {
     fs.readFile(telegramPath, 'utf8', (err, data) => {
         if (err) {
             res.send({ 'type': 'error', 'message': 'cant read' })
-        }
-        let usernames = JSON.parse(data);
-        if (usernames.group_username.includes(username)) {
-            res.send({ 'type': 'warning', 'message': 'already added' });
         } else {
-            usernames.group_username.push(username);
-            fs.writeFile(telegramPath, JSON.stringify(usernames), function (err) {
-                if (err) {
-                    res.send({ 'type': 'error', 'message': 'cant add' });
-                }
-                res.send({ 'type': 'success', 'message': 'username added' });
-            });
+            let usernames = JSON.parse(data);
+            if (usernames.group_username.includes(username)) {
+                res.send({ 'type': 'warning', 'message': 'already added' });
+            } else {
+                usernames.group_username.push(username);
+                fs.writeFile(telegramPath, JSON.stringify(usernames), function (err) {
+                    if (err) {
+                        res.send({ 'type': 'error', 'message': 'cant add' });
+                    }
+                    res.send({ 'type': 'success', 'message': 'username added' });
+                });
+            }
+
         }
+
     });
 }
 
@@ -286,22 +323,24 @@ exports.tgGroupDelete = (req, res) => {
     fs.readFile(telegramPath, 'utf8', (err, data) => {
         if (err) {
             res.send({ 'type': 'error', 'message': 'cant read' })
-        }
-        let usernames = JSON.parse(data);
-        if (usernames.group_username.includes(username)) {
-            const index = usernames.group_username.indexOf(username);
-            if (index > -1) {
-                usernames.group_username.splice(index, 1);
-            }
-            fs.writeFile(telegramPath, JSON.stringify(usernames), function (err) {
-                if (err) {
-                    res.send({ 'type': 'error', 'message': 'cant delete' });
-                }
-                res.send({ 'type': 'success', 'message': 'username removed' });
-            });
         } else {
-            res.send({ 'type': 'error', 'message': 'username not found' });
+            let usernames = JSON.parse(data);
+            if (usernames.group_username.includes(username)) {
+                const index = usernames.group_username.indexOf(username);
+                if (index > -1) {
+                    usernames.group_username.splice(index, 1);
+                }
+                fs.writeFile(telegramPath, JSON.stringify(usernames), function (err) {
+                    if (err) {
+                        res.send({ 'type': 'error', 'message': 'cant delete' });
+                    }
+                    res.send({ 'type': 'success', 'message': 'username removed' });
+                });
+            } else {
+                res.send({ 'type': 'error', 'message': 'username not found' });
+            }
         }
+
     });
 }
 
@@ -317,8 +356,10 @@ exports.linkedinGet = (req, res) => {
     fs.readFile(linkedinPath, 'utf8', (err, data) => {
         if (err) {
             res.send([])
+        } else {
+            res.send(data.split('\n'));
         }
-        res.send(data.split('\n'));
+
     });
 }
 
@@ -328,19 +369,21 @@ exports.linkedinAdd = (req, res) => {
     fs.readFile(linkedinPath, 'utf8', (err, data) => {
         if (err) {
             res.send({ 'type': 'error', 'message': 'cant read' })
-        }
-        let links = data.split('\n');
-        if (links.includes(link)) {
-            res.send({ 'type': 'warning', 'message': 'already added' })
         } else {
-            fs.appendFile(linkedinPath, '\n' + link, function (err) {
-                if (err) {
-                    res.send({ 'type': 'error', 'message': 'cant append' })
-                } else {
-                    res.send({ 'type': 'success', 'message': 'appended' })
-                }
-            });
+            let links = data.split('\n');
+            if (links.includes(link)) {
+                res.send({ 'type': 'warning', 'message': 'already added' })
+            } else {
+                fs.appendFile(linkedinPath, '\n' + link, function (err) {
+                    if (err) {
+                        res.send({ 'type': 'error', 'message': 'cant append' })
+                    } else {
+                        res.send({ 'type': 'success', 'message': 'appended' })
+                    }
+                });
+            }
         }
+
     });
 }
 
@@ -350,22 +393,24 @@ exports.linkedinDelete = (req, res) => {
     fs.readFile(linkedinPath, 'utf8', (err, data) => {
         if (err) {
             res.send({ 'type': 'error', 'message': 'cant read' })
-        }
-        let links = data.split('\n');
-        if (links.includes(link)) {
-            const index = links.indexOf(link);
-            if (index > -1) {
-                links.splice(index, 1);
-            }
-            fs.writeFile(linkedinPath, links.join('\n'), function (err) {
-                if (err) {
-                    res.send({ 'type': 'error', 'message': 'cant delete' });
-                }
-                res.send({ 'type': 'success', 'message': 'link removed' });
-            });
         } else {
-            res.send({ 'type': 'warning', 'message': 'link not found' });
+            let links = data.split('\n');
+            if (links.includes(link)) {
+                const index = links.indexOf(link);
+                if (index > -1) {
+                    links.splice(index, 1);
+                }
+                fs.writeFile(linkedinPath, links.join('\n'), function (err) {
+                    if (err) {
+                        res.send({ 'type': 'error', 'message': 'cant delete' });
+                    }
+                    res.send({ 'type': 'success', 'message': 'link removed' });
+                });
+            } else {
+                res.send({ 'type': 'warning', 'message': 'link not found' });
+            }
         }
+
     });
 }
 

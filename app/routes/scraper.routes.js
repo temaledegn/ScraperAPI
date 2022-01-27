@@ -7,11 +7,18 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-/* ************************************* */
-/* **********   TWITTER      *********** */
-/* ************************************* */
 
 module.exports = function (app) {
+
+  //ACTION
+  app.get("/action", [cors()], controller.actionRequest);
+
+  //END ACTION
+
+
+  /* ************************************* */
+  /* **********   TWITTER      *********** */
+  /* ************************************* */
 
   app.get("/twitter/user-info/:username", [cors(), authJwt.verifyToken, authJwt.isAdmin], controller.twitterUserInfo);
 
@@ -42,8 +49,8 @@ module.exports = function (app) {
   /* ************************************* */
 
   app.get("/linkedin/all-scraped/", [cors(), authJwt.verifyToken, authJwt.isAdmin], controller.linkedinAllScraped);
-  
-  
+
+
   /* ************************************* */
   /* **********   YOUTUBE     *********** */
   /* ************************************* */

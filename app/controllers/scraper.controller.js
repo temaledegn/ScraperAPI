@@ -4,12 +4,61 @@ const uri =
     "mongodb://localhost:27017/?readPreference=primary&appname=MongoDB%20Compass&ssl=false";
 
 
+
+
+
+// Action Request
+
+exports.actionRequest = (req, res) => {
+    res.send('No Action');
+
+    // MongoClient.connect(uri, function (err, db) {
+    //     if (err) throw err;
+    //     var dbo = db.db("twitter-data");
+
+
+    //     for (var i = 0; i < 200; i++) {
+    //         var newVal = {};
+    //         newVal[`tweets.${i.toString()}.reporting`] = {
+    //             "is_reported": null,
+    //             "reporting_date": null,
+    //             "reported_by": null,
+    //             "report_count": 0
+    //         };
+    //         try {
+    //             dbo
+    //                 .collection("twitter")
+    //                 .updateMany(
+    //                     {},
+    //                     {
+    //                         '$set': newVal
+    //                     },
+    //                     function (err, result) {
+    //                         if (err) throw err;
+    //                         res.send('OK');
+    //                         db.close();
+    //                     }
+    //                 )
+    //         } catch (e) {
+
+    //         }
+
+    //     }
+
+    // });
+
+
+}
+
+// End Action Request
+
+
+
 /* ************************************* */
 /* **********   TWITTER      *********** */
 /* ************************************* */
 
 exports.twitterUserInfo = (req, res) => {
-    console.log(req.params.username);
     MongoClient.connect(uri, function (err, db) {
         if (err) throw err;
         var dbo = db.db("twitter-data");
@@ -269,7 +318,7 @@ exports.youtubeAllVideos = (req, res) => {
         var dbo = db.db("youtube-data");
         dbo
             .collection("youtube")
-            .find({}, { projection: { 'post.comment': 0, comment:0 } })
+            .find({}, { projection: { 'comments': 0, comment: 0 } })
             .toArray()
             .then((items) => {
                 res.send(items);
@@ -285,8 +334,8 @@ exports.youtubeComments = (req, res) => {
         dbo
             .collection("youtube")
             .findOne(
-                { _id: req.params.doc_id},
-                { projection: { "post.comment" : 1 } },
+                { _id: MongoClient.ObjectId(req.params.doc_id) },
+                { projection: { "comments": 1 } },
                 function (err, result) {
                     if (err) throw err;
                     res.send(result);
