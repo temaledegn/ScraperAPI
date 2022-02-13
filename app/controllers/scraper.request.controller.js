@@ -4,12 +4,12 @@ const homeDir = require('os').homedir();
 const fs = require('fs');
 
 
-const telegramPath = homeDir + '/Desktop/OSINT/Telegram/data.json'
-const fbPagePath = homeDir + '/Desktop/OSINT/facebook/faceboook-scraper-backend/target.txt'
-const fbUserPath = homeDir + '/Desktop/OSINT/facebook/facebook-scraper-backend-profile/target.txt'
-const twitterPath = homeDir + '/Desktop/OSINT/Twitter/twitterScraper/Authentication/Document.txt'
-const linkedinPath = homeDir + '/Desktop/OSINT/linkedin/datarequ.txt'
-const youtubePath = homeDir + '/Desktop/OSINT/youtube/url.txt'
+const telegramPath = homeDir + '/Desktop/OSINT/Telegram/Telegram/data.json'
+const fbPagePath = homeDir + '/Desktop/OSINT/Facebook/faceboook-scraper-backend/target.txt'
+const fbUserPath = homeDir + '/Desktop/OSINT/Facebook/facebook-scraper-backend-profile/target.txt'
+const twitterPath = homeDir + '/Desktop/OSINT/Twitter/twitter-scraper/Authentication/Document.txt'
+const linkedinPath = homeDir + '/Desktop/OSINT/Linkedin/datarequ.txt'
+const youtubePath = homeDir + '/Desktop/OSINT/YouTube/youtube_Scrape_Api/url.txt'
 
 //*************** FACEBOOK  ******************/
 
