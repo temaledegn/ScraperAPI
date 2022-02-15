@@ -8,7 +8,7 @@ const telegramPath = homeDir + '/Desktop/osint/Telegram/Telegram/data.json'
 const fbPagePath = homeDir + '/Desktop/osint/Facebook/faceboook-scraper-backend/target.txt'
 const fbUserPath = homeDir + '/Desktop/osint/Facebook/facebook-scraper-backend-profile/target.txt'
 const twitterPath = homeDir + '/Desktop/osint/Twitter/twitter-scraper/Authentication/Document.txt'
-const linkedinPath = homeDir + '/Desktop/osint/Linkedin/datarequ.txt'
+const linkedinPath = homeDir + '/Desktop/osint/LinkedIn/datarequ.txt'
 const youtubePath = homeDir + '/Desktop/osint/YouTube/youtube_Scrape_Api/url.txt'
 
 //*************** FACEBOOK  ******************/
