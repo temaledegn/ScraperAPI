@@ -42,5 +42,10 @@ module.exports = function (app) {
   app.post("/scraping/youtube/add", [cors(), authJwt.verifyToken, authJwt.isAdmin], controller.youtubeAdd);
   app.post("/scraping/youtube/delete", [cors(), authJwt.verifyToken, authJwt.isAdmin], controller.youtubeDelete);
 
+
+
+  app.get("/scraping/twitter/start-now", [cors(), authJwt.verifyToken, authJwt.isAdmin], controller.twitterStartNow);
+  app.post("/scraping/facebook/user/start-now", [cors(), authJwt.verifyToken, authJwt.isAdmin], controller.facebookUserStartNow);
+  app.post("/scraping/facebook/page/start-now", [cors(), authJwt.verifyToken, authJwt.isAdmin], controller.facebookPageStartNow);
 }
 

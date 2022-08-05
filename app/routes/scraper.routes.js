@@ -61,6 +61,15 @@ module.exports = function (app) {
 
 
   // app.get("/youtube/search/", [cors(), authJwt.verifyToken, authJwt.isAdmin], controller.youtubeSearch);
+
+
+  /* ************************************* */
+  /* **********   GLOBAL     ************* */
+  /* ************************************* */
+
+  app.get("/common/keyword/search/", [cors(), authJwt.verifyToken, authJwt.isAdmin], controller.globalKeywordSearch);
+
+
 }
 
 

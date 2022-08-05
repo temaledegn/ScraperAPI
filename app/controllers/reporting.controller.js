@@ -4,9 +4,9 @@ const homeDir = require('os').homedir();
 const fs = require('fs');
 
 
-const twitterPath = homeDir + '/Desktop/OSINT/Twitter/twitter-scraper/Authentication/twitter_reporting_ids.txt'
+const twitterPath = homeDir + '/Desktop/osint/Twitter/twitter-scraper/Authentication/twitter_reporting_ids.txt'
 // const telegramPath = homeDir + '/Desktop/OSINT/Telegram/data.json'
-const fbPath = homeDir + '/Desktop/OSINT/Facebook/reporting/fb_reporting_ids.txt'
+const fbPath = homeDir + '/Desktop/osint/Facebook/reporting/fb_reporting_ids.txt'
 // const fbUserPath = homeDir + '/Desktop/OSINT/facebook/facebook-scraper-backend-profile/target.txt'
 // const linkedinPath = homeDir + '/Desktop/OSINT/linkedin/datarequ.txt'
 
