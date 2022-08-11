@@ -44,6 +44,10 @@ module.exports = function (app) {
 
   app.get("/telegram/telegram-posts/:type/:doc_id", [cors(), authJwt.verifyToken, authJwt.isAdmin], controller.telegramPosts);
 
+  app.get("/telegram/channel/search/", [cors(), authJwt.verifyToken, authJwt.isAdmin], controller.telegramChannelSearch);
+
+  app.get("/telegram/group/search/", [cors(), authJwt.verifyToken, authJwt.isAdmin], controller.telegramGroupSearch);
+
   /* ************************************* */
   /* **********   LINKEDIN     *********** */
   /* ************************************* */
@@ -67,7 +71,9 @@ module.exports = function (app) {
   /* **********   GLOBAL     ************* */
   /* ************************************* */
 
-  app.get("/common/keyword/search/", [cors(), authJwt.verifyToken, authJwt.isAdmin], controller.globalKeywordSearch);
+  app.get("/common/keyword/search/", [cors(), authJwt.verifyToken, authJwt.isAdmin], controller.globalKeywordSearch); 
+  
+  app.post("/common/keyword/live-search/", [cors(), authJwt.verifyToken, authJwt.isAdmin], controller.globalKeywordLiveSearch);
 
 
 }

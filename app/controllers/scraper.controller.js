@@ -1,5 +1,10 @@
-
 const MongoClient = require("mongodb");
+const { exec } = require('child_process');
+const homeDir = require('os').homedir();
+
+const { spawnSync } = require( 'child_process' );
+
+
 const uri =
     "mongodb://localhost:27017/?readPreference=primary&appname=MongoDB%20Compass&ssl=false";
 
@@ -235,7 +240,6 @@ exports.telegramGroupAllScraped = (req, res) => {
 };
 
 
-
 exports.telegramPosts = (req, res) => {
     console.log('telegram posts requested');
     console.log(req.params.type);
@@ -275,6 +279,174 @@ exports.telegramPosts = (req, res) => {
 };
 
 
+exports.telegramChannelSearch = (req, res) => {
+    const sq = req.query.q;
+    if (sq[0] === '"' && sq[sq.length - 1] === '"') {
+        let re = new RegExp(".*" + sq.substring(1, sq.length - 1) + ".*", "i");
+        MongoClient.connect(uri, function (err, db) {
+            if (err) throw err;
+            var dbo = db.db("telegram-data");
+            dbo
+                .collection("channels")
+                .aggregate([
+                    {
+                        $project: {
+                            data: {
+                                $filter: {
+                                    input: "$data",
+                                    as: "data",
+                                    cond: {
+                                        $regexMatch: {
+                                            input: "$$data.Message",
+                                            regex: re,
+                                        },
+                                    },
+                                },
+                            },
+                            // Fullname: 1,
+                            // UserName: 1,
+                        },
+                    },
+                ])
+                .toArray()
+                .then((items) => {
+                    res.send(items);
+                    db.close();
+                });
+        });
+    } else if (sq.startsWith("@")) {
+        MongoClient.connect(uri, function (err, db) {
+            if (err) throw err;
+            var dbo = db.db("telegram-data");
+            dbo
+                .collection("channels")
+                .findOne({ channel_username: sq.substring(1) },
+                    function (err, result) {
+                        if (err) throw err;
+                        res.send([result]);
+                        db.close();
+                    });
+        });
+    } else {
+        let re = new RegExp(".*" + sq + ".*", "i");
+        MongoClient.connect(uri, function (err, db) {
+            if (err) throw err;
+            var dbo = db.db("telegram-data");
+            dbo
+                .collection("channels")
+                .aggregate([
+                    {
+                        $project: {
+                            data: {
+                                $filter: {
+                                    input: "$data",
+                                    as: "data",
+                                    cond: {
+                                        $regexMatch: {
+                                            input: "$$data.Message",
+                                            regex: re,
+                                        },
+                                    },
+                                },
+                            },
+                            // Fullname: 1,
+                            // UserName: 1,
+                        },
+                    },
+                ])
+                .toArray()
+                .then((items) => {
+                    res.send(items);
+                    db.close();
+                });
+        });
+    }
+};
+
+
+exports.telegramGroupSearch = (req, res) => {
+    const sq = req.query.q;
+    if (sq[0] === '"' && sq[sq.length - 1] === '"') {
+        let re = new RegExp(".*" + sq.substring(1, sq.length - 1) + ".*", "i");
+        MongoClient.connect(uri, function (err, db) {
+            if (err) throw err;
+            var dbo = db.db("telegram-data");
+            dbo
+                .collection("groups")
+                .aggregate([
+                    {
+                        $project: {
+                            group_data: {
+                                $filter: {
+                                    input: "$group_data",
+                                    as: "group_data",
+                                    cond: {
+                                        $regexMatch: {
+                                            input: "$$group_data.Message",
+                                            regex: re,
+                                        },
+                                    },
+                                },
+                            },
+                            // Fullname: 1,
+                            // UserName: 1,
+                        },
+                    },
+                ])
+                .toArray()
+                .then((items) => {
+                    res.send(items);
+                    db.close();
+                });
+        });
+    } else if (sq.startsWith("@")) {
+        MongoClient.connect(uri, function (err, db) {
+            if (err) throw err;
+            var dbo = db.db("telegram-data");
+            dbo
+                .collection("channels")
+                .findOne({ group_username: sq.substring(1) },
+                    function (err, result) {
+                        if (err) throw err;
+                        res.send([result]);
+                        db.close();
+                    });
+        });
+    } else {
+        let re = new RegExp(".*" + sq + ".*", "i");
+        MongoClient.connect(uri, function (err, db) {
+            if (err) throw err;
+            var dbo = db.db("telegram-data");
+            dbo
+                .collection("groups")
+                .aggregate([
+                    {
+                        $project: {
+                            data: {
+                                $filter: {
+                                    input: "$group_data",
+                                    as: "group_data",
+                                    cond: {
+                                        $regexMatch: {
+                                            input: "$$group_data.Message",
+                                            regex: re,
+                                        },
+                                    },
+                                },
+                            },
+                            // Fullname: 1,
+                            // UserName: 1,
+                        },
+                    },
+                ])
+                .toArray()
+                .then((items) => {
+                    res.send(items);
+                    db.close();
+                });
+        });
+    }
+};
 /* ************************************* */
 /* *********  END TELEGRAM      ******** */
 /* ************************************* */
@@ -524,6 +696,28 @@ exports.globalKeywordSearch = (req, res) => {
         });
     }
 };
+
+
+
+exports.globalKeywordLiveSearch = (req, res) => {
+
+    const twitterScriptPath = homeDir + '/Desktop/osint/Twitter/twitter-scraper/Scraper/index_keyword.py'
+
+    var query = req.body.keyword;
+    var responseContent = [];
+    console.log('testing. . . . ');
+    console.log(req.body.twitterEnabled);
+    if (req.body.twitterEnabled == 'true'){
+
+        const _command = spawnSync( twitterScriptPath+ ' "'+query+'"' );
+        console.log('sending request');
+        res.send(['done']);
+    }
+    
+   
+    
+};
+
 
 
 

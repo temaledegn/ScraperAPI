@@ -4,7 +4,7 @@ const { type } = require('os');
 const { exec } = require('child_process');
 
 
-const telegramPath = homeDir + '/Desktop/OSINT/Telegram/data.json'
+const telegramPath = homeDir + '/Desktop/OSINT/Telegram/Telegram/data.json'
 const fbPagePath = homeDir + '/Desktop/OSINT/Facebook/faceboook-scraper-backend/target.txt'
 const fbUserPath = homeDir + '/Desktop/OSINT/Facebook/facebook-scraper-backend-profile/target.txt'
 const twitterPath = homeDir + '/Desktop/OSINT/Twitter/twitter-scraper/Authentication/Document.txt'
