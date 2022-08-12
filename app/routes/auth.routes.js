@@ -1,6 +1,9 @@
 const { verifySignUp } = require("../middlewares");
 const controller = require("../controllers/auth.controller");
 
+const cors = require("cors"); 
+app.use(cors());
+
 module.exports = function(app) {
   app.use(function(req, res, next) {
     res.header(
@@ -13,11 +16,12 @@ module.exports = function(app) {
   app.post(
     "/api/auth/signup",
     [
+      cors(),
       verifySignUp.checkDuplicateUsernameOrEmail,
       verifySignUp.checkRolesExisted
     ],
     controller.signup
   );
 
-  app.post("/api/auth/signin", controller.signin);
+  app.post("/api/auth/signin", [cors()],controller.signin);
 };
