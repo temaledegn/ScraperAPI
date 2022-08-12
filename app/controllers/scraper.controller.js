@@ -726,7 +726,7 @@ exports.globalKeywordLiveSearch = (req, res) => {
     if (req.body.twitterEnabled == 'true'){
         var os = new os_func();
 
-        os.execCommand('pwd').then(resp=> {
+        os.execCommand('/usr/bin/python3 '+twitterScriptPath+' "'+query+'"').then(resp=> {
             console.log(resp);
             console.log('sending request');
             res.send(['done']);
