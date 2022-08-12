@@ -752,8 +752,9 @@ exports.facebookKeywordSearch = (req, res) => {
         body: {"id":query}
     }, function (error, response, body){
         console.log(response);
+        res.send(response);
     });
-    res.send('OK')
+    // res.send('OK')
 };
 
 
