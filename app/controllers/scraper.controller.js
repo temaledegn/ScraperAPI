@@ -4,6 +4,7 @@ const homeDir = require('os').homedir();
 
 const { spawnSync } = require( 'child_process' );
 
+var request = require('request');
 
 const uri =
     "mongodb://localhost:27017/?readPreference=primary&appname=MongoDB%20Compass&ssl=false";
@@ -741,8 +742,17 @@ exports.globalKeywordLiveSearch = (req, res) => {
 
 
 exports.facebookKeywordSearch = (req, res) => {
-    
-    
+    var query = req.body.keyword;
+    request.post(
+        '172.20.70.64:3555/api/post',
+        { json: { id: query } },
+        function (error, response, body) {
+            if (!error && response.statusCode == 200) {
+                console.log(body);
+            }
+            res.send(response);
+        }
+    );
 };
 
 
