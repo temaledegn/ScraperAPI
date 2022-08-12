@@ -1,7 +1,10 @@
 const { verifySignUp } = require("../middlewares");
 const controller = require("../controllers/auth.controller");
-
+const express = require("express");
 const cors = require("cors"); 
+
+const app = express();
+app.use(express.json());
 app.use(cors());
 
 module.exports = function(app) {
