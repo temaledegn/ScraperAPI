@@ -743,7 +743,7 @@ exports.globalKeywordLiveSearch = (req, res) => {
 
 
 exports.facebookKeywordSearch = (req, res) => {
-    var query = req.body.keyword;
+    var query = req.body.id;
     console.log(query);
     request({
         url: "http://172.20.70.64:3555/api/post",
