@@ -2,6 +2,7 @@ const MongoClient = require("mongodb");
 const { exec } = require('child_process');
 const homeDir = require('os').homedir();
 
+
 const { spawnSync } = require( 'child_process' );
 
 var request = require('request');
@@ -743,16 +744,16 @@ exports.globalKeywordLiveSearch = (req, res) => {
 
 exports.facebookKeywordSearch = (req, res) => {
     var query = req.body.keyword;
-    request.post(
-        '172.20.70.64:3555/api/post',
-        { json: { id: query } },
-        function (error, response, body) {
-            if (!error && response.statusCode == 200) {
-                console.log(body);
-            }
-            res.send(response);
-        }
-    );
+    console.log(query);
+    request({
+        url: "http://172.20.70.64:3555/api/post",
+        method: "POST",
+        json: true,
+        body: {"id":query}
+    }, function (error, response, body){
+        console.log(response);
+    });
+    res.send('OK')
 };
 
 
