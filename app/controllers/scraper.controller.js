@@ -698,6 +698,20 @@ exports.globalKeywordSearch = (req, res) => {
 };
 
 
+function os_func() {
+    this.execCommand = function (cmd) {
+        return new Promise((resolve, reject)=> {
+           exec(cmd, (error, stdout, stderr) => {
+             if (error) {
+                reject(error);
+                return;
+            }
+            resolve(stdout)
+           });
+       })
+   }
+}
+
 
 exports.globalKeywordLiveSearch = (req, res) => {
 
@@ -708,13 +722,26 @@ exports.globalKeywordLiveSearch = (req, res) => {
     console.log('testing. . . . ');
     console.log(req.body.twitterEnabled);
     if (req.body.twitterEnabled == 'true'){
+        var os = new os_func();
 
-        const _command = spawnSync( twitterScriptPath+ ' "'+query+'"' );
-        console.log('sending request');
-        res.send(['done']);
+        os.execCommand('pwd').then(resp=> {
+            console.log(resp);
+            console.log('sending request');
+            res.send(['done']);
+
+        }).catch(err=> {
+            console.log("os >>>", err);
+        })
+
     }
     
-   
+};
+
+
+
+
+exports.facebookKeywordSearch = (req, res) => {
+    
     
 };
 
