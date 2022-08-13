@@ -715,15 +715,28 @@ function os_func() {
 exports.globalKeywordLiveSearch = (req, res) => {
 
     const twitterScriptPath = homeDir + '/Desktop/osint/Twitter/twitter-scraper/Scraper/index_keyword.py'
-
+    
     var query = req.body.keyword;
     var responseContent = [];
     if (req.body.twitterEnabled == 'true'){
+        var startTimestamp = new Date(Date.now().toISOString());
         var os = new os_func();
 
         os.execCommand('/usr/bin/python3 '+twitterScriptPath+' "'+query+'"').then(resp=> {
-            console.log('sending request');
-            res.send(resp);
+            
+        MongoClient.connect(uri, function (err, db) {
+            if (err) throw err;
+            var dbo = db.db("twitter-data");
+            dbo
+                .collection("twitter")
+                .find({ Date: {$gte : startTimestamp}, Scraped_From :'key word'},
+                    function (err, result) {
+                        if (err) throw err;
+                        res.send([result]);
+                        db.close();
+                    });
+        });
+            
 
         }).catch(err=> {
             console.log("os >>>", err);
