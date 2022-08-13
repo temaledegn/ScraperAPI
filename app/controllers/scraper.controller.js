@@ -730,10 +730,10 @@ exports.globalKeywordLiveSearch = (req, res) => {
             var dbo = db.db("twitter-data");
             dbo
                 .collection("twitter")
-                .find({ Date: {$gte : startTimestamp}, Scraped_From :'key word'},
+                .find({ Date: {$gt : startTimestamp}, Scraped_From :'key word'},
                     function (err, result) {
                         if (err) throw err;
-                        res.send([result]);
+                        res.send(result);
                         db.close();
                     });
         });
