@@ -243,9 +243,6 @@ exports.telegramGroupAllScraped = (req, res) => {
 
 
 exports.telegramPosts = (req, res) => {
-    console.log('telegram posts requested');
-    console.log(req.params.type);
-    console.log(req.params.doc_id);
     if (req.params.type == 'group') {
         MongoClient.connect(uri, function (err, db) {
             if (err) throw err;
@@ -721,15 +718,12 @@ exports.globalKeywordLiveSearch = (req, res) => {
 
     var query = req.body.keyword;
     var responseContent = [];
-    console.log('testing. . . . ');
-    console.log(req.body.twitterEnabled);
     if (req.body.twitterEnabled == 'true'){
         var os = new os_func();
 
         os.execCommand('/usr/bin/python3 '+twitterScriptPath+' "'+query+'"').then(resp=> {
-            console.log(resp);
             console.log('sending request');
-            res.send(['done']);
+            res.send(resp);
 
         }).catch(err=> {
             console.log("os >>>", err);
@@ -740,11 +734,8 @@ exports.globalKeywordLiveSearch = (req, res) => {
 };
 
 
-
-
 exports.facebookKeywordSearch = (req, res) => {
     var query = req.body.id;
-    console.log(query);
     request({
         url: "http://172.20.70.64:3555/api/post",
         method: "POST",
@@ -753,7 +744,6 @@ exports.facebookKeywordSearch = (req, res) => {
     }, function (error, response, body){
         res.send(response);
     });
-    // res.send('OK')
 };
 
 
