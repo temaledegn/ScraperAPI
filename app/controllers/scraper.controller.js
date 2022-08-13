@@ -719,7 +719,7 @@ exports.globalKeywordLiveSearch = (req, res) => {
     var query = req.body.keyword;
     var responseContent = [];
     if (req.body.twitterEnabled == 'true'){
-        var startTimestamp = Date.now();
+        var startTimestamp = (new Date()).toISOString();
         var os = new os_func();
 
         os.execCommand('/usr/bin/python3 '+twitterScriptPath+' "'+query+'"').then(resp=> {
