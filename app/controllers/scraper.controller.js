@@ -729,7 +729,7 @@ exports.globalKeywordLiveSearch = (req, res) => {
                     var dbo = db.db("twitter-data");
                     dbo
                         .collection("twitter")
-                        .find({ Date: {$gt : startTimestamp}, Scraped_From :'key word', 'keyword used':query})
+                        .find({ Date_of_Scraping: {$gt : startTimestamp}, Scraped_From :'key word', 'Keyword used':query})
                         .toArray()
                         .then((items) => {
                             res.send(items);
