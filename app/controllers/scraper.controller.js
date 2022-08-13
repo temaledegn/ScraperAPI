@@ -722,7 +722,8 @@ exports.globalKeywordLiveSearch = (req, res) => {
         var startTimestamp = Date.now();
         var os = new os_func();
 
-        os.execCommand('/usr/bin/python3 '+twitterScriptPath+' "'+query+'"').then(resp=> {
+        // os.execCommand('/usr/bin/python3 '+twitterScriptPath+' "'+query+'"').then(resp=> {
+            os.execCommand('ls').then(resp=> {
             
         MongoClient.connect(uri, function (err, db) {
             if (err) throw err;
