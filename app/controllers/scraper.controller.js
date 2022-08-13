@@ -719,16 +719,17 @@ exports.globalKeywordLiveSearch = (req, res) => {
     var query = req.body.keyword;
     var responseContent = [];
     if (req.body.twitterEnabled == 'true'){
-        var startTimestamp = (new Date()).toISOString();
+        var startTimestamp = new Date();
         var os = new os_func();
 
-        os.execCommand('/usr/bin/python3 '+twitterScriptPath+' "'+query+'"').then(resp=> {
+        // os.execCommand('ls').then(resp=> {
+            os.execCommand('/usr/bin/python3 '+twitterScriptPath+' "'+query+'"').then(resp=> {
                 MongoClient.connect(uri, function (err, db) {
                     if (err) throw err;
                     var dbo = db.db("twitter-data");
                     dbo
                         .collection("twitter")
-                        .find({ Date: {$gt : startTimestamp}, Scraped_From :'key word'})
+                        .find({ Date: {$gt : startTimestamp}, Scraped_From :'key word', 'keyword used':query})
                         .toArray()
                         .then((items) => {
                             res.send(items);
