@@ -724,19 +724,21 @@ exports.globalKeywordLiveSearch = (req, res) => {
 
         // os.execCommand('/usr/bin/python3 '+twitterScriptPath+' "'+query+'"').then(resp=> {
             os.execCommand('ls').then(resp=> {
+
+                MongoClient.connect(uri, function (err, db) {
+                    if (err) throw err;
+                    var dbo = db.db("twitter-data");
+                    dbo
+                        .collection("twitter")
+                        .find({ Date: {$gt : startTimestamp}, Scraped_From :'key word'})
+                        .toArray()
+                        .then((items) => {
+                            res.send(items);
+                            db.close();
+                        });
+                });
             
-        MongoClient.connect(uri, function (err, db) {
-            if (err) throw err;
-            var dbo = db.db("twitter-data");
-            dbo
-                .collection("twitter")
-                .find({ Date: {$gt : startTimestamp}, Scraped_From :'key word'},
-                    function (err, result) {
-                        if (err) throw err;
-                        res.send(result);
-                        db.close();
-                    });
-        });
+ 
             
 
         }).catch(err=> {
