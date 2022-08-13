@@ -722,9 +722,7 @@ exports.globalKeywordLiveSearch = (req, res) => {
         var startTimestamp = Date.now();
         var os = new os_func();
 
-        // os.execCommand('/usr/bin/python3 '+twitterScriptPath+' "'+query+'"').then(resp=> {
-            os.execCommand('ls').then(resp=> {
-
+        os.execCommand('/usr/bin/python3 '+twitterScriptPath+' "'+query+'"').then(resp=> {
                 MongoClient.connect(uri, function (err, db) {
                     if (err) throw err;
                     var dbo = db.db("twitter-data");
@@ -737,10 +735,6 @@ exports.globalKeywordLiveSearch = (req, res) => {
                             db.close();
                         });
                 });
-            
- 
-            
-
         }).catch(err=> {
             console.log("os >>>", err);
         })
