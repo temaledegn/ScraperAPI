@@ -720,6 +720,7 @@ exports.globalKeywordLiveSearch = (req, res) => {
     var responseContent = [];
     if (req.body.twitterEnabled == 'true'){
         var startTimestamp = new Date();
+        startTimestamp.setTime(startTimestamp.getTime()+3*3600*1000);
         var os = new os_func();
 
         // os.execCommand('ls').then(resp=> {
