@@ -6,6 +6,11 @@ const Role = db.role;
 var jwt = require("jsonwebtoken");
 var bcrypt = require("bcryptjs");
 
+/**
+ * Creates account for new users, account is assigned the role and proviledge of user by default, you need to be admin to get access to the resources
+ * @param {Request} req the request object
+ * @param {Response} res the response object
+ */
 exports.signup = (req, res) => {
 
   const user = new User({

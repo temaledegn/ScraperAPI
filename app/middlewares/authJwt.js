@@ -4,6 +4,9 @@ const db = require("../models");
 const User = db.user;
 const Role = db.role;
 
+/**
+ * Verifies if the request contains a valid token which belongs to the requesting user
+ */
 verifyToken = (req, res, next) => {
   let token = req.headers["x-access-token"];
 
@@ -20,6 +23,9 @@ verifyToken = (req, res, next) => {
   });
 };
 
+/**
+ * Verifies if the user is assigned the role admin
+ */
 isAdmin = (req, res, next) => {
   User.findById(req.userId).exec((err, user) => {
     if (err) {
@@ -51,6 +57,9 @@ isAdmin = (req, res, next) => {
   });
 };
 
+/**
+ * Currently useless but verifies if the user is assigned to role of moderator, use this to add new level of priviledge
+ */
 isModerator = (req, res, next) => {
   User.findById(req.userId).exec((err, user) => {
     if (err) {

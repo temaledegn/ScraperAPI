@@ -21,6 +21,11 @@ const twitterCurrentlyScrapingKeywordPath = homeDir + '/Desktop/OSINT/Twitter/tw
 
 //*************** FACEBOOK  ******************/
 
+/**
+ * Returns facebook user links that are being scraped continuously
+ * @param {Request} req The request object
+ * @param {Response} res The response object
+ */
 exports.fbUserGet = (req, res) => {
     let _type = req.query.type;
     fs.readFile(_type == 'link' ? fbUserPath:fbUserKeywordsPath, 'utf8', (err, data) => {
@@ -33,6 +38,11 @@ exports.fbUserGet = (req, res) => {
     });
 }
 
+/**
+ * Adds new user link to the scraping queue
+ * @param {Request} req The request object containing the new user link that is gonna be added
+ * @param {Response} res The response object
+ */
 exports.fbUserAdd = (req, res) => {
     let _type = req.body.type;
     let entry =  _type == 'link' ? req.body.link:req.body.keyword;
@@ -58,6 +68,11 @@ exports.fbUserAdd = (req, res) => {
     });
 }
 
+/**
+ * Deletes existing user link from to the scraping queue
+ * @param {Request} req The request object containing the existing user link that is gonna be deleted
+ * @param {Response} res The response object
+ */
 exports.fbUserDelete = (req, res) => {
     let _type = req.body.type;
     let entry =  _type == 'link' ? req.body.link:req.body.keyword;
@@ -88,6 +103,11 @@ exports.fbUserDelete = (req, res) => {
     });
 }
 
+/**
+ * Returns facebook page/group links that are being scraped continuously
+ * @param {Request} req The request object
+ * @param {Response} res The response object
+ */
 exports.fbPageGet = (req, res) => {
     let _type = req.query.type;
     fs.readFile(_type == 'link' ? fbPagePath : fbPageKeywordsPath, 'utf8', (err, data) => {
@@ -100,6 +120,11 @@ exports.fbPageGet = (req, res) => {
     });
 }
 
+/**
+ * Adds new page/group link to the scraping queue
+ * @param {Request} req The request object containing the new page/group link that is gonna be added
+ * @param {Response} res The response object
+ */
 exports.fbPageAdd = (req, res) => {
     let _type = req.body.type;
     let entry = _type == 'link' ? req.body.link : req.body.keyword;
@@ -123,7 +148,11 @@ exports.fbPageAdd = (req, res) => {
 
     });
 }
-
+/**
+ * Deletes existing page/group link from to the scraping queue
+ * @param {Request} req The request object containing the existing page/group link that is gonna be deleted
+ * @param {Response} res The response object
+ */
 exports.fbPageDelete = (req, res) => {
     let _type = req.body.type;
     let entry = _type == 'link' ? req.body.link : req.body.keyword;
@@ -159,6 +188,11 @@ exports.fbPageDelete = (req, res) => {
 
 //*************** TWITTER  ******************/
 
+/**
+ * Returns twitter usernames that are being scraped continuously
+ * @param {Request} req The request object
+ * @param {Response} res The response object
+ */
 exports.twitterGet = (req, res) => {
     let _type = req.query.type;
     fs.readFile(_type == 'username'? twitterPath:twitterKeywordsPath, 'utf8', (err, data) => {
@@ -170,7 +204,11 @@ exports.twitterGet = (req, res) => {
 
     });
 }
-
+/**
+ * Adds new twitter username to the scraping queue
+ * @param {Request} req The request object containing the new username that is gonna be added
+ * @param {Response} res The response object
+ */
 exports.twitterAdd = (req, res) => {
     let _type = req.body.type;
     let entry = _type == 'username' ? req.body.username:req.body.keyword;
@@ -195,6 +233,11 @@ exports.twitterAdd = (req, res) => {
     });
 }
 
+/**
+ * Deletes existing twitter username from the scraping queue
+ * @param {Request} req The request object containing the existing twitter username that is gonna be deleted
+ * @param {Response} res The response object
+ */
 exports.twitterDelete = (req, res) => {
     let _type = req.body.type;
     let entry = _type == 'username' ? req.body.username:req.body.keyword;
@@ -228,7 +271,11 @@ exports.twitterDelete = (req, res) => {
 
 //*************** TELEGRAM  ******************/
 
-
+/**
+ * Returns twitter channel and group usernames that are being scraped continuously
+ * @param {Request} req The request object
+ * @param {Response} res The response object
+ */
 exports.tgGet = (req, res) => {
     fs.readFile(telegramPath, 'utf8', (err, data) => {
         if (err) {
@@ -239,7 +286,11 @@ exports.tgGet = (req, res) => {
 
     });
 }
-
+/**
+ * Adds new telegram channel username to the scraping queue
+ * @param {Request} req The request object containing the new username that is gonna be added
+ * @param {Response} res The response object
+ */
 exports.tgChannelAdd = (req, res) => {
     let username = req.body.username;
     fs.readFile(telegramPath, 'utf8', (err, data) => {
@@ -265,6 +316,11 @@ exports.tgChannelAdd = (req, res) => {
     });
 }
 
+/**
+ * Deletes existing telegram channel username from the scraping queue
+ * @param {Request} req The request object containing the existing telegram channel username that is gonna be deleted
+ * @param {Response} res The response object
+ */
 exports.tgChannelDelete = (req, res) => {
     let username = req.body.username;
 
@@ -294,6 +350,11 @@ exports.tgChannelDelete = (req, res) => {
     });
 }
 
+/**
+ * Adds new telegram group username to the scraping queue
+ * @param {Request} req The request object containing the new username that is gonna be added
+ * @param {Response} res The response object
+ */
 exports.tgGroupAdd = (req, res) => {
     let username = req.body.username;
     fs.readFile(telegramPath, 'utf8', (err, data) => {
@@ -318,6 +379,11 @@ exports.tgGroupAdd = (req, res) => {
     });
 }
 
+/**
+ * Deletes existing telegram group username from the scraping queue
+ * @param {Request} req The request object containing the existing telegram group username that is gonna be deleted
+ * @param {Response} res The response object
+ */
 exports.tgGroupDelete = (req, res) => {
     let username = req.body.username;
 
@@ -352,7 +418,11 @@ exports.tgGroupDelete = (req, res) => {
 
 //***************** LINKEDIN  ********************/
 
-
+/**
+ * Returns linkedin profile links that are being scraped continuously
+ * @param {Request} req The request object
+ * @param {Response} res The response object
+ */
 exports.linkedinGet = (req, res) => {
     fs.readFile(linkedinPath, 'utf8', (err, data) => {
         if (err) {
@@ -363,7 +433,11 @@ exports.linkedinGet = (req, res) => {
 
     });
 }
-
+/**
+ * Adds new linkedin profile link to the scraping queue
+ * @param {Request} req The request object containing the new link that is gonna be added
+ * @param {Response} res The response object
+ */
 exports.linkedinAdd = (req, res) => {
     let link = req.body.link;
 
@@ -388,6 +462,11 @@ exports.linkedinAdd = (req, res) => {
     });
 }
 
+/**
+ * Deletes existing linkedin profile link from the scraping queue
+ * @param {Request} req The request object containing the existing linkedin profile link that is gonna be deleted
+ * @param {Response} res The response object
+ */
 exports.linkedinDelete = (req, res) => {
     let link = req.body.link;
 
@@ -421,7 +500,11 @@ exports.linkedinDelete = (req, res) => {
 
 //***************** YOUTUBE  ********************/
 
-
+/**
+ * Returns youtube video links that are being scraped continuously
+ * @param {Request} req The request object
+ * @param {Response} res The response object
+ */
 exports.youtubeGet = (req, res) => {
     fs.readFile(youtubePath, 'utf8', (err, data) => {
         if (err) {
@@ -433,6 +516,11 @@ exports.youtubeGet = (req, res) => {
     });
 }
 
+/**
+ * Adds new youtube video link the scraping queue
+ * @param {Request} req The request object containing the youtube video link that is gonna be added
+ * @param {Response} res The response object
+ */
 exports.youtubeAdd = (req, res) => {
     let link = req.body.link;
 
@@ -457,6 +545,11 @@ exports.youtubeAdd = (req, res) => {
     });
 }
 
+/**
+ * Deletes existing youtube video link from the scraping queue
+ * @param {Request} req The request object containing the existing youtube video link that is gonna be deleted
+ * @param {Response} res The response object
+ */
 exports.youtubeDelete = (req, res) => {
     let link = req.body.link;
 
@@ -490,34 +583,34 @@ exports.youtubeDelete = (req, res) => {
 
 
 
-exports.twitterStartNow = (req, res) => {
-    let keyword = req.body.keyword;
-    exec('python3 '+twitterScraperScriptPath + ' ' + keyword, (err, stdout, stderr) => {
-        if (err) {
-            res.send({ 'type': 'error', 'message': 'Can not start at the moment!' });
-            return;
-        }
-        res.send({ 'type': 'success', 'message': 'Scraping Started!' });
-      });
-}
+// exports.twitterStartNow = (req, res) => {
+//     let keyword = req.body.keyword;
+//     exec('python3 '+twitterScraperScriptPath + ' ' + keyword, (err, stdout, stderr) => {
+//         if (err) {
+//             res.send({ 'type': 'error', 'message': 'Can not start at the moment!' });
+//             return;
+//         }
+//         res.send({ 'type': 'success', 'message': 'Scraping Started!' });
+//       });
+// }
 
 
-exports.facebookUserStartNow = (req, res) => {
-    let keyword = req.body.keyword;
+// exports.facebookUserStartNow = (req, res) => {
+//     let keyword = req.body.keyword;
 
-    exec('cat *.js bad_file | wc -l', (err, stdout, stderr) => {
-        if (err) {
-            res.send({ 'type': 'error', 'message': 'Can not start at the moment!' });
-            return;
-        }
-        res.send({ 'type': 'success', 'message': 'Scraping Started!' });
+//     exec('cat *.js bad_file | wc -l', (err, stdout, stderr) => {
+//         if (err) {
+//             res.send({ 'type': 'error', 'message': 'Can not start at the moment!' });
+//             return;
+//         }
+//         res.send({ 'type': 'success', 'message': 'Scraping Started!' });
 
-      });
-}
+//       });
+// }
 
 
-exports.facebookPageStartNow = (req, res) => {
-    let keyword = req.body.keyword;
-    res.send({ 'type': 'error', 'message': 'cant read' });
+// exports.facebookPageStartNow = (req, res) => {
+//     let keyword = req.body.keyword;
+//     res.send({ 'type': 'error', 'message': 'cant read' });
  
-}
+// }

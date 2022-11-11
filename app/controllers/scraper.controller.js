@@ -9,6 +9,10 @@ var request = require('request');
 
 const winston =  require('winston');
 
+const { networkInterfaces } = require('os');
+
+const nets = networkInterfaces();
+
 const logConfiguration = {
     'transports': [
         new winston.transports.File({
@@ -240,6 +244,12 @@ exports.twitterSearch = (req, res) => {
 /* ************************************* */
 
 
+
+/**
+ * Used to fetch the scraped telegram channel usersnames with their scraped date
+ * @param {Request} req The request object
+ * @param {Response} res The response object, containing scraped telegram channel names and their scraping date
+ */
 exports.telegramChannelAllScraped = (req, res) => {
     MongoClient.connect(uri, function (err, db) {
         if (err) {
@@ -258,7 +268,11 @@ exports.telegramChannelAllScraped = (req, res) => {
     });
 };
 
-
+/**
+ * Used to fetch the scraped telegram group usersnames with their scraped date
+ * @param {Request} req The request object
+ * @param {Response} res The response object, containing scraped telegram group names and their scraping date
+ */
 exports.telegramGroupAllScraped = (req, res) => {
     MongoClient.connect(uri, function (err, db) {
          if (err) {
@@ -329,7 +343,11 @@ exports.telegramPosts = (req, res) => {
 
 };
 
-
+/**
+ * Search scraped telegram channels' posts and returns the post if there is a match
+ * @param {Request} req The request object, containing the keyword
+ * @param {Rsponse} res The response object
+ */
 exports.telegramChannelSearch = (req, res) => {
     const sq = req.query.q;
     if (sq[0] === '"' && sq[sq.length - 1] === '"') {
@@ -426,7 +444,11 @@ exports.telegramChannelSearch = (req, res) => {
     }
 };
 
-
+/**
+ * Search scraped telegram groups' posts and returns the post if there is a match
+ * @param {Request} req The request object, containing the keyword
+ * @param {Rsponse} res The response object
+ */
 exports.telegramGroupSearch = (req, res) => {
     const sq = req.query.q;
     if (sq[0] === '"' && sq[sq.length - 1] === '"') {
@@ -531,7 +553,11 @@ exports.telegramGroupSearch = (req, res) => {
 /* ************************************* */
 
 
-
+/**
+ * Returns all the available data on linkedin 
+ * @param {Request} req The request object
+ * @param {Response} res The response object
+ */
 exports.linkedinAllScraped = (req, res) => {
     MongoClient.connect(uri, function (err, db) {
          if (err) {
@@ -562,6 +588,12 @@ exports.linkedinAllScraped = (req, res) => {
 /* **********   YOUTUBE      *********** */
 /* ************************************* */
 
+
+/**
+ * Returns basic info about the videos 
+ * @param {Request} req The request object
+ * @param {Response} res The response object, containing number of views, number of likes, channel name in whcih the video belongs to, number of subscribers of the channel, if it is being reported and the scraping dates
+ */
 exports.youtubeAllVideos = (req, res) => {
     MongoClient.connect(uri, function (err, db) {
          if (err) {
@@ -580,6 +612,11 @@ exports.youtubeAllVideos = (req, res) => {
     });
 }
 
+/**
+ * Returns all the available scraped comments on a specific youtube video
+ * @param {Request} req The request object containing the doc_id
+ * @param {Response} res The response object
+ */
 exports.youtubeComments = (req, res) => {
     MongoClient.connect(uri, function (err, db) {
          if (err) {
@@ -712,6 +749,11 @@ exports.youtubeComments = (req, res) => {
 /* ************  COMMON     ************ */
 /* ************************************* */
  
+/**
+ * Searchs for posts containing the specified search query from all platforms
+ * @param {Request} req The request object containing the search query 
+ * @param {Response} res The response object to contian the matched results
+ */
 exports.globalKeywordSearch = (req, res) => {
     const sq = req.query.q;
     if (sq[0] === '"' && sq[sq.length - 1] === '"') {
@@ -808,7 +850,9 @@ exports.globalKeywordSearch = (req, res) => {
     }
 };
 
-
+/**
+ * Used by devs to execute command by sending request
+ */
 function os_func() {
     this.execCommand = function (cmd) {
         return new Promise((resolve, reject)=> {
@@ -824,6 +868,11 @@ function os_func() {
 }
 
 
+/**
+ * Performs live search for posts containing the specified search query from all platforms
+ * @param {Request} req The request object containing the search query 
+ * @param {Response} res The response object to contian the matched results
+ */
 exports.globalKeywordLiveSearch = (req, res) => {
 
     const twitterScriptPath = homeDir + '/Desktop/osint/Twitter/twitter-scraper/Scraper/index_keyword.py'
@@ -853,22 +902,43 @@ exports.globalKeywordLiveSearch = (req, res) => {
                         });
                 });
         }).catch(err=> {
-            console.log("os >>>", err);
+            logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
         })
 
     }
     
 };
 
-
+/**
+ * Initiates the facebook live search and returns the response when it'd done
+ * @param {Request} req The request object containing the search query
+ * @param {Response} res The response object
+ */
 exports.facebookKeywordSearch = (req, res) => {
     var query = req.body.id;
+    const results = Object.create(null);
+
+    for (const name of Object.keys(nets)) {
+        for (const net of nets[name]) {
+            // Skip over non-IPv4 and internal (i.e. 127.0.0.1) addresses
+            // 'IPv4' is in Node <= 17, from 18 it's a number 4 or 6
+            const familyV4Value = typeof net.family === 'string' ? 'IPv4' : 4
+            if (net.family === familyV4Value && !net.internal) {
+                if (!results[name]) {
+                    results[name] = [];
+                }
+                results[name].push(net.address);
+            }
+        }
+    }
+
     request({
-        url: "http://172.20.70.64:3555/api/post",
+        url: 'http://' +results["ens192"][0]+":3555/api/post",
         method: "POST",
         json: true,
         body: {"id":query}
     }, function (error, response, body){
+        logger.error(`${err.status || 500} - ${res.statusMessage} - ${error.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
         res.send(response);
     });
 };

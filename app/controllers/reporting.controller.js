@@ -12,6 +12,11 @@ const fbPath = homeDir + '/Desktop/osint/Facebook/reporting/fb_reporting_ids.txt
 
 //*************** FACEBOOK  ******************/
 
+/**
+ * Returns the posts the facebook reporter is working on reporting
+ * @param {Request} req The request object
+ * @param {Response} res The response object
+ */
 exports.fbGet = (req, res) => {
     fs.readFile(fbPath, 'utf8', (err, data) => {
         if (err) {
@@ -31,15 +36,17 @@ exports.fbGet = (req, res) => {
                 ++i;
               }
             }
-
-
             res.send(response);
         }
         
     });
 }
 
-
+/**
+ * Adds new post to be reported to the queue
+ * @param {Request} req The request object, it should contain reporting_data in its body
+ * @param {Response} res The response object
+ */
 exports.fbAdd = (req, res) => {
     let reporting_data = req.body.reporting_data;
 
@@ -64,6 +71,11 @@ exports.fbAdd = (req, res) => {
     });
 }
 
+/**
+ * Deletes existing post to be reported from the queue
+ * @param {Request} req The request object, it should contain reporting_data in its body
+ * @param {Response} res The response object
+ */
 exports.fbDelete = (req, res) => {
     let reporting_data = req.body.reporting_data;
 
@@ -97,7 +109,11 @@ exports.fbDelete = (req, res) => {
 //*************** TWITTER  ******************/
 
 
-  
+/**
+ * Returns the posts the twitter reporter is working on reporting
+ * @param {Request} req The request object
+ * @param {Response} res The response object
+ */
 exports.twitterGet = (req, res) => {
     fs.readFile(twitterPath, 'utf8', (err, data) => {
         if (err) {
@@ -125,7 +141,11 @@ exports.twitterGet = (req, res) => {
     });
 }
 
-
+/**
+ * Adds new post to be reported to the queue
+ * @param {Request} req The request object, it should contain reporting_data in its body
+ * @param {Response} res The response object
+ */
 exports.twitterAdd = (req, res) => {
     let reporting_data = req.body.reporting_data;
 
@@ -150,6 +170,11 @@ exports.twitterAdd = (req, res) => {
     });
 }
 
+/**
+ * Deletes existing post to be reported from the queue
+ * @param {Request} req The request object, it should contain reporting_data in its body
+ * @param {Response} res The response object
+ */
 exports.twitterDelete = (req, res) => {
     let reporting_data = req.body.reporting_data;
 
