@@ -63,6 +63,11 @@ exports.signup = (req, res) => {
   });
 };
 
+/**
+ * Sign in users or responds with error message based on their request
+ * @param {Request} req The request object
+ * @param {Response} res The response object
+ */
 exports.signin = (req, res) => {
   User.findOne({
     username: req.body.username

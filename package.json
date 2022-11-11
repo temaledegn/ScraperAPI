@@ -22,6 +22,11 @@
     "express": "^4.17.1",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.9.1",
-    "request": "^2.88.2"
+    "morgan": "^1.10.0",
+    "request": "^2.88.2",
+    "winston": "^3.8.2"
+  },
+  "devDependencies": {
+    "@types/morgan": "^1.9.3"
   }
 }

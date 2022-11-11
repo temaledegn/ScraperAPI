@@ -17,6 +17,21 @@ app.use(bodyParser.json());
 // parse requests of content-type - application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: true }));
 
+
+
+const fs = require('fs')
+const morgan = require('morgan')
+const path = require('path')
+
+// Create a write stream (in append mode)
+const accessLogStream = fs.createWriteStream(path.join(__dirname, 'logs/access.log'), { flags: 'a' })
+
+// Setup the logger
+app.use(morgan('combined', { stream: accessLogStream }))
+
+
+
+
 const db = require("./app/models");
 const Role = db.role;
 
@@ -45,6 +60,8 @@ require("./app/routes/auth.routes")(app);
 require("./app/routes/user.routes")(app);
 require("./app/routes/scraper.request.routes")(app);
 require("./app/routes/reporting.routes")(app);
+
+
 
 // set port, listen for requests
 const PORT = process.env.PORT || 3001;

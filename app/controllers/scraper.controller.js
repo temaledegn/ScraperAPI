@@ -7,54 +7,25 @@ const { spawnSync } = require( 'child_process' );
 
 var request = require('request');
 
+const winston =  require('winston');
+
+const logConfiguration = {
+    'transports': [
+        new winston.transports.File({
+            filename: 'logs/server.log'
+        })
+    ]
+};
+
+const logger = winston.createLogger(logConfiguration);
+
 const uri =
     "mongodb://localhost:27017/?readPreference=primary&appname=MongoDB%20Compass&ssl=false";
-
-
-
-
 
 // Action Request
 
 exports.actionRequest = (req, res) => {
     res.send('No Action');
-
-    // MongoClient.connect(uri, function (err, db) {
-    //     if (err) throw err;
-    //     var dbo = db.db("twitter-data");
-
-
-    //     for (var i = 0; i < 200; i++) {
-    //         var newVal = {};
-    //         newVal[`tweets.${i.toString()}.reporting`] = {
-    //             "is_reported": null,
-    //             "reporting_date": null,
-    //             "reported_by": null,
-    //             "report_count": 0
-    //         };
-    //         try {
-    //             dbo
-    //                 .collection("twitter")
-    //                 .updateMany(
-    //                     {},
-    //                     {
-    //                         '$set': newVal
-    //                     },
-    //                     function (err, result) {
-    //                         if (err) throw err;
-    //                         res.send('OK');
-    //                         db.close();
-    //                     }
-    //                 )
-    //         } catch (e) {
-
-    //         }
-
-    //     }
-
-    // });
-
-
 }
 
 // End Action Request
@@ -65,9 +36,17 @@ exports.actionRequest = (req, res) => {
 /* **********   TWITTER      *********** */
 /* ************************************* */
 
+/**
+ * Returns response containing information about the given username if found
+ * @param {Request} req The request object which should contain the twitter username
+ * @param {Response} res Response object for the request
+ */
 exports.twitterUserInfo = (req, res) => {
     MongoClient.connect(uri, function (err, db) {
-        if (err) throw err;
+        if (err) {
+            logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+            throw err;
+        }
         var dbo = db.db("twitter-data");
         dbo
             .collection("twitter")
@@ -75,7 +54,10 @@ exports.twitterUserInfo = (req, res) => {
                 { "UserName": '@' + req.params.username },
                 { projection: { tweets: 0 } },
                 function (err, result) {
-                    if (err) throw err;
+                    if (err) {
+                        logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+                        throw err;
+                    }
                     res.send(result);
                     db.close();
                 }
@@ -83,9 +65,17 @@ exports.twitterUserInfo = (req, res) => {
     });
 }
 
+/**
+ * Returns all the available users scraped from the twitter platform
+ * @param {Request} req A request object
+ * @param {Response} res A response object
+ */
 exports.twitterAllUsers = (req, res) => {
     MongoClient.connect(uri, function (err, db) {
-        if (err) throw err;
+        if (err) {
+            logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+            throw err;
+        }
         var dbo = db.db("twitter-data");
         dbo
             .collection("twitter")
@@ -98,9 +88,17 @@ exports.twitterAllUsers = (req, res) => {
     });
 }
 
+/**
+ * Returns all the available tweets using the specified document ID
+ * @param {Request} req A request object containing document id
+ * @param {Response} res A response object containing the tweets
+ */
 exports.twitterTweets = (req, res) => {
     MongoClient.connect(uri, function (err, db) {
-        if (err) throw err;
+         if (err) {
+                logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+                throw err;
+            }
         var dbo = db.db("twitter-data");
         dbo
             .collection("twitter")
@@ -108,7 +106,10 @@ exports.twitterTweets = (req, res) => {
                 { _id: MongoClient.ObjectId(req.params.doc_id) },
                 { projection: { tweets: 1 } },
                 function (err, result) {
-                    if (err) throw err;
+                     if (err) {
+                logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+                throw err;
+            }
                     res.send(result);
                     db.close();
                 }
@@ -116,12 +117,32 @@ exports.twitterTweets = (req, res) => {
     });
 }
 
+/**
+ * Performs search based on search parameter in the request object and returns matching posts if any
+ * 
+ * Search query types: 
+ * 
+ * Raw alphanumeric string eg. hello : searches posts containing the word hello
+ * 
+ * Start with @: eg. @username: searches all the posts from the user with usename 'username'
+ * 
+ * Enclose in quotations: eg. "@username": earches posts containing the word '@username', useful for mentions
+ * @param {Request} req A request object contining the search parameter
+ * @param {Response} res A response object containing tweets matching the search query
+ */
 exports.twitterSearch = (req, res) => {
     const sq = req.query.q;
+    if (sq == undefined){
+        logger.warn(`${500} - ${'Search Query Not Specified'} - - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+        res.send('Search Query Not Specified')
+    }
     if (sq[0] === '"' && sq[sq.length - 1] === '"') {
         let re = new RegExp(".*" + sq.substring(1, sq.length - 1) + ".*", "i");
         MongoClient.connect(uri, function (err, db) {
-            if (err) throw err;
+            if (err) {
+                logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+                throw err;
+            }
             var dbo = db.db("twitter-data");
             dbo
                 .collection("twitter")
@@ -153,13 +174,19 @@ exports.twitterSearch = (req, res) => {
         });
     } else if (sq.startsWith("@")) {
         MongoClient.connect(uri, function (err, db) {
-            if (err) throw err;
+            if (err) {
+                logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+                throw err;
+            }
             var dbo = db.db("twitter-data");
             dbo
                 .collection("twitter")
                 .findOne({ UserName: sq },
                     function (err, result) {
-                        if (err) throw err;
+                         if (err) {
+                logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+                throw err;
+            }
                         res.send([result]);
                         db.close();
                     });
@@ -167,7 +194,10 @@ exports.twitterSearch = (req, res) => {
     } else {
         let re = new RegExp(".*" + sq + ".*", "i");
         MongoClient.connect(uri, function (err, db) {
-            if (err) throw err;
+            if (err) {
+                logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+                throw err;
+            }
             var dbo = db.db("twitter-data");
             dbo
                 .collection("twitter")
@@ -212,7 +242,10 @@ exports.twitterSearch = (req, res) => {
 
 exports.telegramChannelAllScraped = (req, res) => {
     MongoClient.connect(uri, function (err, db) {
-        if (err) throw err;
+        if (err) {
+            logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+            throw err;
+        }
         var dbo = db.db("telegram-data");
         dbo
             .collection("channels")
@@ -228,7 +261,10 @@ exports.telegramChannelAllScraped = (req, res) => {
 
 exports.telegramGroupAllScraped = (req, res) => {
     MongoClient.connect(uri, function (err, db) {
-        if (err) throw err;
+         if (err) {
+                logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+                throw err;
+            }
         var dbo = db.db("telegram-data");
         dbo
             .collection("groups")
@@ -241,18 +277,28 @@ exports.telegramGroupAllScraped = (req, res) => {
     });
 };
 
-
+/**
+ * Returns telegram posts based on the request type
+ * @param {Request} req Request object containing the type of telegram media (channel/group)
+ * @param {Response} res Response object containing the telegram posts
+ */
 exports.telegramPosts = (req, res) => {
     if (req.params.type == 'group') {
         MongoClient.connect(uri, function (err, db) {
-            if (err) throw err;
+             if (err) {
+                logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+                throw err;
+            }
             var dbo = db.db("telegram-data");
             dbo
                 .collection("groups")
                 .findOne(
                     { _id: MongoClient.ObjectId(req.params.doc_id) },
                     function (err, result) {
-                        if (err) throw err;
+                         if (err) {
+                logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+                throw err;
+            }
                         res.send(result);
                         db.close();
                     }
@@ -260,14 +306,20 @@ exports.telegramPosts = (req, res) => {
         });
     } else if (req.params.type == 'channel') {
         MongoClient.connect(uri, function (err, db) {
-            if (err) throw err;
+             if (err) {
+                logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+                throw err;
+            }
             var dbo = db.db("telegram-data");
             dbo
                 .collection("channels")
                 .findOne(
                     { _id: MongoClient.ObjectId(req.params.doc_id) },
                     function (err, result) {
-                        if (err) throw err;
+                         if (err) {
+                logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+                throw err;
+            }
                         res.send(result);
                         db.close();
                     }
@@ -283,7 +335,10 @@ exports.telegramChannelSearch = (req, res) => {
     if (sq[0] === '"' && sq[sq.length - 1] === '"') {
         let re = new RegExp(".*" + sq.substring(1, sq.length - 1) + ".*", "i");
         MongoClient.connect(uri, function (err, db) {
-            if (err) throw err;
+             if (err) {
+                logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+                throw err;
+            }
             var dbo = db.db("telegram-data");
             dbo
                 .collection("channels")
@@ -315,13 +370,19 @@ exports.telegramChannelSearch = (req, res) => {
         });
     } else if (sq.startsWith("@")) {
         MongoClient.connect(uri, function (err, db) {
-            if (err) throw err;
+             if (err) {
+                logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+                throw err;
+            }
             var dbo = db.db("telegram-data");
             dbo
                 .collection("channels")
                 .findOne({ channel_username: sq.substring(1) },
                     function (err, result) {
-                        if (err) throw err;
+                         if (err) {
+                logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+                throw err;
+            }
                         res.send([result]);
                         db.close();
                     });
@@ -329,7 +390,10 @@ exports.telegramChannelSearch = (req, res) => {
     } else {
         let re = new RegExp(".*" + sq + ".*", "i");
         MongoClient.connect(uri, function (err, db) {
-            if (err) throw err;
+             if (err) {
+                logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+                throw err;
+            }
             var dbo = db.db("telegram-data");
             dbo
                 .collection("channels")
@@ -368,7 +432,10 @@ exports.telegramGroupSearch = (req, res) => {
     if (sq[0] === '"' && sq[sq.length - 1] === '"') {
         let re = new RegExp(".*" + sq.substring(1, sq.length - 1) + ".*", "i");
         MongoClient.connect(uri, function (err, db) {
-            if (err) throw err;
+             if (err) {
+                logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+                throw err;
+            }
             var dbo = db.db("telegram-data");
             dbo
                 .collection("groups")
@@ -400,13 +467,19 @@ exports.telegramGroupSearch = (req, res) => {
         });
     } else if (sq.startsWith("@")) {
         MongoClient.connect(uri, function (err, db) {
-            if (err) throw err;
+             if (err) {
+                logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+                throw err;
+            }
             var dbo = db.db("telegram-data");
             dbo
                 .collection("channels")
                 .findOne({ group_username: sq.substring(1) },
                     function (err, result) {
-                        if (err) throw err;
+                         if (err) {
+                logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+                throw err;
+            }
                         res.send([result]);
                         db.close();
                     });
@@ -414,7 +487,10 @@ exports.telegramGroupSearch = (req, res) => {
     } else {
         let re = new RegExp(".*" + sq + ".*", "i");
         MongoClient.connect(uri, function (err, db) {
-            if (err) throw err;
+             if (err) {
+                logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+                throw err;
+            }
             var dbo = db.db("telegram-data");
             dbo
                 .collection("groups")
@@ -458,7 +534,10 @@ exports.telegramGroupSearch = (req, res) => {
 
 exports.linkedinAllScraped = (req, res) => {
     MongoClient.connect(uri, function (err, db) {
-        if (err) throw err;
+         if (err) {
+                logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+                throw err;
+            }
         var dbo = db.db("linkedin-data");
         dbo
             .collection("profile")
@@ -485,7 +564,10 @@ exports.linkedinAllScraped = (req, res) => {
 
 exports.youtubeAllVideos = (req, res) => {
     MongoClient.connect(uri, function (err, db) {
-        if (err) throw err;
+         if (err) {
+                logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+                throw err;
+            }
         var dbo = db.db("youtube-data");
         dbo
             .collection("youtube")
@@ -500,7 +582,10 @@ exports.youtubeAllVideos = (req, res) => {
 
 exports.youtubeComments = (req, res) => {
     MongoClient.connect(uri, function (err, db) {
-        if (err) throw err;
+         if (err) {
+                logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+                throw err;
+            }
         var dbo = db.db("youtube-data");
         dbo
             .collection("youtube")
@@ -508,7 +593,10 @@ exports.youtubeComments = (req, res) => {
                 { _id: MongoClient.ObjectId(req.params.doc_id) },
                 { projection: { "comments": 1 } },
                 function (err, result) {
-                    if (err) throw err;
+                     if (err) {
+                logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+                throw err;
+            }
                     res.send(result);
                     db.close();
                 }
@@ -521,7 +609,10 @@ exports.youtubeComments = (req, res) => {
 //     if (sq[0] === '"' && sq[sq.length - 1] === '"') {
 //         let re = new RegExp(".*" + sq.substring(1, sq.length - 1) + ".*", "i");
 //         MongoClient.connect(uri, function (err, db) {
-//             if (err) throw err;
+//              if (err) {
+                // logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+                // throw err;
+            // }
 //             var dbo = db.db("twitter-data");
 //             dbo
 //                 .collection("twitter")
@@ -553,13 +644,19 @@ exports.youtubeComments = (req, res) => {
 //         });
 //     } else if (sq.startsWith("@")) {
 //         MongoClient.connect(uri, function (err, db) {
-//             if (err) throw err;
+//              if (err) {
+            //     logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+            //     throw err;
+            // }
 //             var dbo = db.db("twitter-data");
 //             dbo
 //                 .collection("twitter")
 //                 .findOne({ UserName: sq },
 //                     function (err, result) {
-//                         if (err) throw err;
+//                          if (err) {
+            //     logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+            //     throw err;
+            // }
 //                         res.send([result]);
 //                         db.close();
 //                     });
@@ -567,7 +664,10 @@ exports.youtubeComments = (req, res) => {
 //     } else {
 //         let re = new RegExp(".*" + sq + ".*", "i");
 //         MongoClient.connect(uri, function (err, db) {
-//             if (err) throw err;
+//              if (err) {
+            //     logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+            //     throw err;
+            // }
 //             var dbo = db.db("twitter-data");
 //             dbo
 //                 .collection("twitter")
@@ -617,7 +717,10 @@ exports.globalKeywordSearch = (req, res) => {
     if (sq[0] === '"' && sq[sq.length - 1] === '"') {
         let re = new RegExp(".*" + sq.substring(1, sq.length - 1) + ".*", "i");
         MongoClient.connect(uri, function (err, db) {
-            if (err) throw err;
+             if (err) {
+                logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+                throw err;
+            }
             var dbo = db.db("twitter-data");
             dbo
                 .collection("twitter")
@@ -649,13 +752,19 @@ exports.globalKeywordSearch = (req, res) => {
         });
     } else if (sq.startsWith("@")) {
         MongoClient.connect(uri, function (err, db) {
-            if (err) throw err;
+             if (err) {
+                logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+                throw err;
+            }
             var dbo = db.db("twitter-data");
             dbo
                 .collection("twitter")
                 .findOne({ UserName: sq },
                     function (err, result) {
-                        if (err) throw err;
+                         if (err) {
+                logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+                throw err;
+            }
                         res.send([result]);
                         db.close();
                     });
@@ -663,7 +772,10 @@ exports.globalKeywordSearch = (req, res) => {
     } else {
         let re = new RegExp(".*" + sq + ".*", "i");
         MongoClient.connect(uri, function (err, db) {
-            if (err) throw err;
+             if (err) {
+                logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+                throw err;
+            }
             var dbo = db.db("twitter-data");
             dbo
                 .collection("twitter")
@@ -726,7 +838,10 @@ exports.globalKeywordLiveSearch = (req, res) => {
         // os.execCommand('ls').then(resp=> {
             os.execCommand('/usr/bin/python3 '+twitterScriptPath+' "'+query+'"').then(resp=> {
                 MongoClient.connect(uri, function (err, db) {
-                    if (err) throw err;
+                     if (err) {
+                logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+                throw err;
+            }
                     var dbo = db.db("twitter-data");
                     dbo
                         .collection("twitter")
