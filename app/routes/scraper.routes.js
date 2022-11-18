@@ -71,12 +71,12 @@ module.exports = function (app) {
   /* **********   GLOBAL     ************* */
   /* ************************************* */
 
-  app.post("/common/keyword/facebook/", [cors()], controller.facebookKeywordSearch); 
+  app.post("/common/keyword/facebook-live-search/", [cors()], controller.facebookKeywordLiveSearch); 
 
 
-  app.get("/common/keyword/search/", [cors(), authJwt.verifyToken, authJwt.isAdmin], controller.globalKeywordSearch); 
+  // app.get("/common/keyword/search/", [cors(), authJwt.verifyToken, authJwt.isAdmin], controller.globalKeywordSearch); 
   
-  app.post("/common/keyword/live-search/", [cors(), authJwt.verifyToken, authJwt.isAdmin], controller.globalKeywordLiveSearch);
+  app.post("/common/keyword/twitter-live-search/", [cors(), authJwt.verifyToken, authJwt.isAdmin], controller.twitterKeywordLiveSearch);
 
 
 }

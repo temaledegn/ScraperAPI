@@ -44,8 +44,8 @@ module.exports = function (app) {
 
 
 
-  app.get("/scraping/twitter/start-now", [cors(), authJwt.verifyToken, authJwt.isAdmin], controller.twitterStartNow);
-  app.post("/scraping/facebook/user/start-now", [cors(), authJwt.verifyToken, authJwt.isAdmin], controller.facebookUserStartNow);
-  app.post("/scraping/facebook/page/start-now", [cors(), authJwt.verifyToken, authJwt.isAdmin], controller.facebookPageStartNow);
+  // app.get("/scraping/twitter/start-now", [cors(), authJwt.verifyToken, authJwt.isAdmin], controller.twitterStartNow);
+  // app.post("/scraping/facebook/user/start-now", [cors(), authJwt.verifyToken, authJwt.isAdmin], controller.facebookUserStartNow);
+  // app.post("/scraping/facebook/page/start-now", [cors(), authJwt.verifyToken, authJwt.isAdmin], controller.facebookPageStartNow);
 }
 

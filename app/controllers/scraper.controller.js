@@ -750,107 +750,6 @@ exports.youtubeComments = (req, res) => {
 /* ************************************* */
  
 /**
- * Searchs for posts containing the specified search query from all platforms
- * @param {Request} req The request object containing the search query 
- * @param {Response} res The response object to contian the matched results
- */
-exports.globalKeywordSearch = (req, res) => {
-    const sq = req.query.q;
-    if (sq[0] === '"' && sq[sq.length - 1] === '"') {
-        let re = new RegExp(".*" + sq.substring(1, sq.length - 1) + ".*", "i");
-        MongoClient.connect(uri, function (err, db) {
-             if (err) {
-                logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
-                throw err;
-            }
-            var dbo = db.db("twitter-data");
-            dbo
-                .collection("twitter")
-                .aggregate([
-                    {
-                        $project: {
-                            tweets: {
-                                $filter: {
-                                    input: "$tweets",
-                                    as: "tweets",
-                                    cond: {
-                                        $regexMatch: {
-                                            input: "$$tweets.tweet",
-                                            regex: re,
-                                        },
-                                    },
-                                },
-                            },
-                            // Fullname: 1,
-                            // UserName: 1,
-                        },
-                    },
-                ])
-                .toArray()
-                .then((items) => {
-                    res.send(items);
-                    db.close();
-                });
-        });
-    } else if (sq.startsWith("@")) {
-        MongoClient.connect(uri, function (err, db) {
-             if (err) {
-                logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
-                throw err;
-            }
-            var dbo = db.db("twitter-data");
-            dbo
-                .collection("twitter")
-                .findOne({ UserName: sq },
-                    function (err, result) {
-                         if (err) {
-                logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
-                throw err;
-            }
-                        res.send([result]);
-                        db.close();
-                    });
-        });
-    } else {
-        let re = new RegExp(".*" + sq + ".*", "i");
-        MongoClient.connect(uri, function (err, db) {
-             if (err) {
-                logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
-                throw err;
-            }
-            var dbo = db.db("twitter-data");
-            dbo
-                .collection("twitter")
-                .aggregate([
-                    {
-                        $project: {
-                            tweets: {
-                                $filter: {
-                                    input: "$tweets",
-                                    as: "tweets",
-                                    cond: {
-                                        $regexMatch: {
-                                            input: "$$tweets.tweet",
-                                            regex: re,
-                                        },
-                                    },
-                                },
-                            },
-                            // Fullname: 1,
-                            // UserName: 1,
-                        },
-                    },
-                ])
-                .toArray()
-                .then((items) => {
-                    res.send(items);
-                    db.close();
-                });
-        });
-    }
-};
-
-/**
  * Used by devs to execute command by sending request
  */
 function os_func() {
@@ -873,39 +772,39 @@ function os_func() {
  * @param {Request} req The request object containing the search query 
  * @param {Response} res The response object to contian the matched results
  */
-exports.globalKeywordLiveSearch = (req, res) => {
+exports.twitterKeywordLiveSearch = (req, res) => {
 
     const twitterScriptPath = homeDir + '/Desktop/osint/Twitter/twitter-scraper/Scraper/index_keyword.py'
     
     var query = req.body.keyword;
     var responseContent = [];
-    if (req.body.twitterEnabled == 'true'){
-        var startTimestamp = new Date();
-        startTimestamp.setTime(startTimestamp.getTime()+3*3600*1000);
-        var os = new os_func();
+ 
+    var startTimestamp = new Date();
+    startTimestamp.setTime(startTimestamp.getTime()+3*3600*1000);
+    var os = new os_func();
 
-        // os.execCommand('ls').then(resp=> {
-            os.execCommand('/usr/bin/python3 '+twitterScriptPath+' "'+query+'"').then(resp=> {
-                MongoClient.connect(uri, function (err, db) {
-                     if (err) {
-                logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
-                throw err;
-            }
-                    var dbo = db.db("twitter-data");
-                    dbo
-                        .collection("twitter")
-                        .find({ Date_of_Scraping: {$gt : startTimestamp}, Scraped_From :'key word', 'Keyword used':query})
-                        .toArray()
-                        .then((items) => {
-                            res.send(items);
-                            db.close();
-                        });
-                });
-        }).catch(err=> {
+    // os.execCommand('ls').then(resp=> {
+        os.execCommand('/usr/bin/python3 '+twitterScriptPath+' "'+query+'"').then(resp=> {
+            MongoClient.connect(uri, function (err, db) {
+                    if (err) {
             logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
-        })
+            throw err;
+        }
+                var dbo = db.db("twitter-data");
+                dbo
+                    .collection("twitter-keyword")
+                    .find({ Date_of_Scraping: {$gt : startTimestamp}, 'Keyword':query})
+                    .toArray()
+                    .then((items) => {
+                        res.send(items);
+                        db.close();
+                    });
+            });
+    }).catch(err=> {
+        logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+    })
 
-    }
+    
     
 };
 
@@ -914,7 +813,7 @@ exports.globalKeywordLiveSearch = (req, res) => {
  * @param {Request} req The request object containing the search query
  * @param {Response} res The response object
  */
-exports.facebookKeywordSearch = (req, res) => {
+exports.facebookKeywordLiveSearch = (req, res) => {
     var query = req.body.id;
     const results = Object.create(null);
 
@@ -932,13 +831,22 @@ exports.facebookKeywordSearch = (req, res) => {
         }
     }
 
+    var _ip = results["ens192"];
+    if (_ip == undefined){
+        _ip = results["en0"];
+    }
+    _ip = _ip[0];
+
     request({
-        url: 'http://' +results["ens192"][0]+":3555/api/post",
+        url: 'http://' +_ip+":3555/api/post",
         method: "POST",
         json: true,
         body: {"id":query}
     }, function (error, response, body){
-        logger.error(`${err.status || 500} - ${res.statusMessage} - ${error.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+        if (error){
+            logger.error(`${error.status || 500} - ${res.statusMessage} - ${error.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+        }
+        
         res.send(response);
     });
 };
