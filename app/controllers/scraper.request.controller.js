@@ -4,20 +4,20 @@ const { type } = require('os');
 const { exec } = require('child_process');
 
 
-const telegramPath = homeDir + '/Desktop/OSINT/Telegram/Telegram/data.json'
-const fbPagePath = homeDir + '/Desktop/OSINT/Facebook/faceboook-scraper-backend/target.txt'
-const fbUserPath = homeDir + '/Desktop/OSINT/Facebook/facebook-scraper-backend-profile/target.txt'
-const twitterPath = homeDir + '/Desktop/OSINT/Twitter/twitter-scraper/Authentication/Document.txt'
-const linkedinPath = homeDir + '/Desktop/OSINT/LinkedIn/datarequ.txt'
-const youtubePath = homeDir + '/Desktop/OSINT/YouTube/youtube_Scrape_/url.txt'
+const telegramPath = homeDir + '/Desktop/osint/Telegram/Telegram/data.json'
+const fbPagePath = homeDir + '/Desktop/osint/Facebook/faceboook-scraper-backend/target.txt'
+const fbUserPath = homeDir + '/Desktop/osint/Facebook/facebook-scraper-backend-profile/target.txt'
+const twitterPath = homeDir + '/Desktop/osint/Twitter/twitter-scraper/Authentication/Document.txt'
+const linkedinPath = homeDir + '/Desktop/osint/LinkedIn/datarequ.txt'
+const youtubePath = homeDir + '/Desktop/osint/YouTube/youtube_Scrape_/url.txt'
 
 
-const fbPageKeywordsPath = homeDir + '/Desktop/OSINT/Facebook/faceboook-scraper-backend/targetKeywords.txt'
-const fbUserKeywordsPath = homeDir + '/Desktop/OSINT/Facebook/facebook-scraper-backend-profile/targetKeywords.txt'
-const twitterKeywordsPath = homeDir + '/Desktop/OSINT/Twitter/twitter-scraper/Authentication/DocumentKeywords.txt'
+const fbPageKeywordsPath = homeDir + '/Desktop/osint/Facebook/faceboook-scraper-backend/targetKeywords.txt'
+const fbUserKeywordsPath = homeDir + '/Desktop/osint/Facebook/facebook-scraper-backend-profile/targetKeywords.txt'
+const twitterKeywordsPath = homeDir + '/Desktop/osint/Twitter/twitter-scraper/Authentication/DocumentKeywords.txt'
 
-const twitterScraperScriptPath = '/Desktop/OSINT/Twitter/twitter-scraper/scraper/index.py'
-const twitterCurrentlyScrapingKeywordPath = homeDir + '/Desktop/OSINT/Twitter/twitter-scraper/currentlyScrapingKeyword.txt'
+const twitterScraperScriptPath = '/Desktop/osint/Twitter/twitter-scraper/scraper/index.py'
+const twitterCurrentlyScrapingKeywordPath = homeDir + '/Desktop/osint/Twitter/twitter-scraper/currentlyScrapingKeyword.txt'
 
 //*************** FACEBOOK  ******************/
 
