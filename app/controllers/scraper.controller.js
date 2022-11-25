@@ -802,6 +802,7 @@ exports.twitterKeywordLiveSearch = (req, res) => {
             });
     }).catch(err=> {
         logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+        res.send([])
     })
 
     
