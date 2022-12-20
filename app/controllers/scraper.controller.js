@@ -227,8 +227,35 @@ exports.twitterSearch = (req, res) => {
                 ])
                 .toArray()
                 .then((items) => {
-                    res.send(items);
+
+                dbo
+                .collection("twitter-keyword")
+                .aggregate([
+                    {
+                        $project: {
+                            tweets: {
+                                $filter: {
+                                    input: "$tweets",
+                                    as: "tweets",
+                                    cond: {
+                                        $regexMatch: {
+                                            input: "$$tweets.tweet",
+                                            regex: re,
+                                        },
+                                    },
+                                },
+                            },
+                            // Fullname: 1,
+                            // UserName: 1,
+                        },
+                    },
+                ]).toArray()
+                .then((live_items) => {
+                    res.send(items.concat(live_items));
                     db.close();
+                })
+
+                    
                 });
         });
     }
