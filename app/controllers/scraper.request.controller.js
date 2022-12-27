@@ -55,7 +55,7 @@ exports.fbUserAdd = (req, res) => {
             if (links.includes(entry)) {
                 res.send({ 'type': 'warning', 'message': 'already added' })
             } else {
-                fs.appendFile(_type == 'link' ? fbUserPath:fbUserKeywordsPath, entry + '\n', function (err) {
+                fs.appendFile(_type == 'link' ? fbUserPath:fbUserKeywordsPath, + '\n' + entry, function (err) {
                     if (err) {
                         res.send({ 'type': 'error', 'message': 'cant append' })
                     } else {
