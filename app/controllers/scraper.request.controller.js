@@ -634,7 +634,7 @@ exports.youtubeDelete = (req, res) => {
 //     let keyword = req.body.keyword;
 //     exec('python3 '+twitterScraperScriptPath + ' ' + keyword, (err, stdout, stderr) => {
 //         if (err) { 
-  logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+//   logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
 //             res.send({ 'type': 'error', 'message': 'Can not start at the moment!' });
 //             return;
 //         }
@@ -648,7 +648,7 @@ exports.youtubeDelete = (req, res) => {
 
 //     exec('cat *.js bad_file | wc -l', (err, stdout, stderr) => {
 //         if (err) { 
-  logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+//   logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
 //             res.send({ 'type': 'error', 'message': 'Can not start at the moment!' });
 //             return;
 //         }
