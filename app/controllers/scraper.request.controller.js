@@ -4,6 +4,19 @@ const { type } = require('os');
 const { exec } = require('child_process');
 
 
+const winston =  require('winston');
+
+const logConfiguration = {
+    'transports': [
+        new winston.transports.File({
+            filename: 'logs/server.log'
+        })
+    ]
+};
+
+const logger = winston.createLogger(logConfiguration);
+
+
 const telegramPath = homeDir + '/Desktop/osint/Telegram/Telegram/data.json'
 const fbPagePath = homeDir + '/Desktop/osint/Facebook/faceboook-scraper-backend/target.txt'
 const fbUserPath = homeDir + '/Desktop/osint/Facebook/facebook-scraper-backend-profile/target.txt'
