@@ -29,7 +29,8 @@ const twitterCurrentlyScrapingKeywordPath = homeDir + '/Desktop/osint/Twitter/tw
 exports.fbUserGet = (req, res) => {
     let _type = req.query.type;
     fs.readFile(_type == 'link' ? fbUserPath:fbUserKeywordsPath, 'utf8', (err, data) => {
-        if (err) {
+        if (err) { 
+  logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
             res.send([])
         } else {
             res.send(data.split('\n'));
@@ -48,15 +49,17 @@ exports.fbUserAdd = (req, res) => {
     let entry =  _type == 'link' ? req.body.link:req.body.keyword;
     
     fs.readFile(_type == 'link' ? fbUserPath:fbUserKeywordsPath, 'utf8', (err, data) => {
-        if (err) {
+        if (err) { 
+            logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
             res.send({ 'type': 'error', 'message': 'cant read' })
         } else {
             let links = data.split('\n');
             if (links.includes(entry)) {
                 res.send({ 'type': 'warning', 'message': 'already added' })
             } else {
-                fs.appendFile(_type == 'link' ? fbUserPath:fbUserKeywordsPath, + '\n' + entry, function (err) {
-                    if (err) {
+                fs.appendFile(_type == 'link' ? fbUserPath:fbUserKeywordsPath, '\n' + entry, function (err) {
+                   if (err) { 
+                        logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
                         res.send({ 'type': 'error', 'message': 'cant append' })
                     } else {
                         res.send({ 'type': 'success', 'message': 'appended' })
@@ -78,7 +81,8 @@ exports.fbUserDelete = (req, res) => {
     let entry =  _type == 'link' ? req.body.link:req.body.keyword;
 
     fs.readFile(_type == 'link' ? fbUserPath:fbUserKeywordsPath, 'utf8', (err, data) => {
-        if (err) {
+        if (err) { 
+  logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
             res.send({ 'type': 'error', 'message': 'cant read' })
         } else {
             let links = data.split('\n');
@@ -88,7 +92,8 @@ exports.fbUserDelete = (req, res) => {
                     links.splice(index, 1);
                 }
                 fs.writeFile(_type == 'link' ? fbUserPath:fbUserKeywordsPath, links.join('\n'), function (err) {
-                    if (err) {
+                    if (err) { 
+  logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
                         res.send({ 'type': 'error', 'message': 'cant delete' });
                     } else {
                         res.send({ 'type': 'success', 'message': 'link removed' });
@@ -111,7 +116,8 @@ exports.fbUserDelete = (req, res) => {
 exports.fbPageGet = (req, res) => {
     let _type = req.query.type;
     fs.readFile(_type == 'link' ? fbPagePath : fbPageKeywordsPath, 'utf8', (err, data) => {
-        if (err) {
+        if (err) { 
+  logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
             res.send([])
         } else {
 
@@ -129,7 +135,8 @@ exports.fbPageAdd = (req, res) => {
     let _type = req.body.type;
     let entry = _type == 'link' ? req.body.link : req.body.keyword;
     fs.readFile(_type == 'link' ? fbPagePath : fbPageKeywordsPath, 'utf8', (err, data) => {
-        if (err) {
+        if (err) { 
+  logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
             res.send({ 'type': 'error', 'message': 'cant read' })
         } else {
             let links = data.split('\n');
@@ -137,7 +144,8 @@ exports.fbPageAdd = (req, res) => {
                 res.send({ 'type': 'warning', 'message': 'already added' })
             } else {
                 fs.appendFile(_type == 'link' ? fbPagePath : fbPageKeywordsPath, '\n' + entry, function (err) {
-                    if (err) {
+                    if (err) { 
+  logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
                         res.send({ 'type': 'error', 'message': 'cant append' })
                     } else {
                         res.send({ 'type': 'success', 'message': _type+' Added' })
@@ -158,7 +166,8 @@ exports.fbPageDelete = (req, res) => {
     let entry = _type == 'link' ? req.body.link : req.body.keyword;
     
     fs.readFile(_type == 'link' ? fbPagePath : fbPageKeywordsPath, 'utf8', (err, data) => {
-        if (err) {
+        if (err) { 
+  logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
             res.send({ 'type': 'error', 'message': 'cant read' })
         } else {
             let links = data.split('\n');
@@ -168,7 +177,8 @@ exports.fbPageDelete = (req, res) => {
                     links.splice(index, 1);
                 }
                 fs.writeFile(_type == 'link' ? fbPagePath : fbPageKeywordsPath, links.join('\n'), function (err) {
-                    if (err) {
+                    if (err) { 
+  logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
                         res.send({ 'type': 'error', 'message': 'cant delete' });
                     } else {
                         res.send({ 'type': 'success', 'message': _type+' removed' });
@@ -196,7 +206,8 @@ exports.fbPageDelete = (req, res) => {
 exports.twitterGet = (req, res) => {
     let _type = req.query.type;
     fs.readFile(_type == 'username'? twitterPath:twitterKeywordsPath, 'utf8', (err, data) => {
-        if (err) {
+        if (err) { 
+  logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
             res.send([])
         } else {
             res.send(data.split('\n'));
@@ -213,7 +224,8 @@ exports.twitterAdd = (req, res) => {
     let _type = req.body.type;
     let entry = _type == 'username' ? req.body.username:req.body.keyword;
     fs.readFile(_type == 'username'? twitterPath:twitterKeywordsPath, 'utf8', (err, data) => {
-        if (err) {
+        if (err) { 
+  logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
             res.send({ 'type': 'error', 'message': 'cant read' })
         } else {
 
@@ -222,7 +234,8 @@ exports.twitterAdd = (req, res) => {
                 res.send({ 'type': 'warning', 'message': 'already added' })
             } else {
                 fs.appendFile(_type == 'username'? twitterPath:twitterKeywordsPath, '\n' + entry, function (err) {
-                    if (err) {
+                    if (err) { 
+  logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
                         res.send({ 'type': 'error', 'message': 'cant append' })
                     } else {
                         res.send({ 'type': 'success', 'message': _type+' added' })
@@ -242,7 +255,8 @@ exports.twitterDelete = (req, res) => {
     let _type = req.body.type;
     let entry = _type == 'username' ? req.body.username:req.body.keyword;
     fs.readFile(_type == 'username'? twitterPath:twitterKeywordsPath, 'utf8', (err, data) => {
-        if (err) {
+        if (err) { 
+  logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
             res.send({ 'type': 'error', 'message': 'cant read' })
         } else {
             let usernames = data.split('\n');
@@ -252,7 +266,8 @@ exports.twitterDelete = (req, res) => {
                     usernames.splice(index, 1);
                 }
                 fs.writeFile(_type == 'username'? twitterPath:twitterKeywordsPath, usernames.join('\n'), function (err) {
-                    if (err) {
+                    if (err) { 
+  logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
                         res.send({ 'type': 'error', 'message': 'cant delete' });
                     } else {
                         res.send({ 'type': 'success', 'message': 'username removed' });
@@ -278,7 +293,8 @@ exports.twitterDelete = (req, res) => {
  */
 exports.tgGet = (req, res) => {
     fs.readFile(telegramPath, 'utf8', (err, data) => {
-        if (err) {
+        if (err) { 
+  logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
             res.send({ 'type': 'error', })
         } else {
             res.send(JSON.parse(data));
@@ -294,7 +310,8 @@ exports.tgGet = (req, res) => {
 exports.tgChannelAdd = (req, res) => {
     let username = req.body.username;
     fs.readFile(telegramPath, 'utf8', (err, data) => {
-        if (err) {
+        if (err) { 
+  logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
             res.send({ 'type': 'error', 'message': 'cant read' })
         } else {
             let usernames = JSON.parse(data);
@@ -303,7 +320,8 @@ exports.tgChannelAdd = (req, res) => {
             } else {
                 usernames.channel_username.push(username);
                 fs.writeFile(telegramPath, JSON.stringify(usernames), function (err) {
-                    if (err) {
+                    if (err) { 
+  logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
                         res.send({ 'type': 'error', 'message': 'cant add' });
                     } else {
                         res.send({ 'type': 'success', 'message': 'username added' });
@@ -325,7 +343,8 @@ exports.tgChannelDelete = (req, res) => {
     let username = req.body.username;
 
     fs.readFile(telegramPath, 'utf8', (err, data) => {
-        if (err) {
+        if (err) { 
+  logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
             res.send({ 'type': 'error', 'message': 'cant read' })
         } else {
             let usernames = JSON.parse(data);
@@ -335,7 +354,8 @@ exports.tgChannelDelete = (req, res) => {
                     usernames.channel_username.splice(index, 1);
                 }
                 fs.writeFile(telegramPath, JSON.stringify(usernames), function (err) {
-                    if (err) {
+                    if (err) { 
+  logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
                         res.send({ 'type': 'error', 'message': 'cant delete' });
                     } else {
                         res.send({ 'type': 'success', 'message': 'username removed' });
@@ -358,7 +378,8 @@ exports.tgChannelDelete = (req, res) => {
 exports.tgGroupAdd = (req, res) => {
     let username = req.body.username;
     fs.readFile(telegramPath, 'utf8', (err, data) => {
-        if (err) {
+        if (err) { 
+  logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
             res.send({ 'type': 'error', 'message': 'cant read' })
         } else {
             let usernames = JSON.parse(data);
@@ -367,7 +388,8 @@ exports.tgGroupAdd = (req, res) => {
             } else {
                 usernames.group_username.push(username);
                 fs.writeFile(telegramPath, JSON.stringify(usernames), function (err) {
-                    if (err) {
+                    if (err) { 
+  logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
                         res.send({ 'type': 'error', 'message': 'cant add' });
                     }
                     res.send({ 'type': 'success', 'message': 'username added' });
@@ -388,7 +410,8 @@ exports.tgGroupDelete = (req, res) => {
     let username = req.body.username;
 
     fs.readFile(telegramPath, 'utf8', (err, data) => {
-        if (err) {
+        if (err) { 
+  logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
             res.send({ 'type': 'error', 'message': 'cant read' })
         } else {
             let usernames = JSON.parse(data);
@@ -398,7 +421,8 @@ exports.tgGroupDelete = (req, res) => {
                     usernames.group_username.splice(index, 1);
                 }
                 fs.writeFile(telegramPath, JSON.stringify(usernames), function (err) {
-                    if (err) {
+                    if (err) { 
+  logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
                         res.send({ 'type': 'error', 'message': 'cant delete' });
                     }
                     res.send({ 'type': 'success', 'message': 'username removed' });
@@ -425,7 +449,8 @@ exports.tgGroupDelete = (req, res) => {
  */
 exports.linkedinGet = (req, res) => {
     fs.readFile(linkedinPath, 'utf8', (err, data) => {
-        if (err) {
+        if (err) { 
+  logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
             res.send([])
         } else {
             res.send(data.split('\n'));
@@ -442,7 +467,8 @@ exports.linkedinAdd = (req, res) => {
     let link = req.body.link;
 
     fs.readFile(linkedinPath, 'utf8', (err, data) => {
-        if (err) {
+        if (err) { 
+  logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
             res.send({ 'type': 'error', 'message': 'cant read' })
         } else {
             let links = data.split('\n');
@@ -450,7 +476,8 @@ exports.linkedinAdd = (req, res) => {
                 res.send({ 'type': 'warning', 'message': 'already added' })
             } else {
                 fs.appendFile(linkedinPath, '\n' + link, function (err) {
-                    if (err) {
+                    if (err) { 
+  logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
                         res.send({ 'type': 'error', 'message': 'cant append' })
                     } else {
                         res.send({ 'type': 'success', 'message': 'appended' })
@@ -471,7 +498,8 @@ exports.linkedinDelete = (req, res) => {
     let link = req.body.link;
 
     fs.readFile(linkedinPath, 'utf8', (err, data) => {
-        if (err) {
+        if (err) { 
+  logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
             res.send({ 'type': 'error', 'message': 'cant read' })
         } else {
             let links = data.split('\n');
@@ -481,7 +509,8 @@ exports.linkedinDelete = (req, res) => {
                     links.splice(index, 1);
                 }
                 fs.writeFile(linkedinPath, links.join('\n'), function (err) {
-                    if (err) {
+                    if (err) { 
+  logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
                         res.send({ 'type': 'error', 'message': 'cant delete' });
                     }
                     res.send({ 'type': 'success', 'message': 'link removed' });
@@ -507,7 +536,8 @@ exports.linkedinDelete = (req, res) => {
  */
 exports.youtubeGet = (req, res) => {
     fs.readFile(youtubePath, 'utf8', (err, data) => {
-        if (err) {
+        if (err) { 
+  logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
             res.send([])
         } else {
             res.send(data.split('\n'));
@@ -525,7 +555,8 @@ exports.youtubeAdd = (req, res) => {
     let link = req.body.link;
 
     fs.readFile(youtubePath, 'utf8', (err, data) => {
-        if (err) {
+        if (err) { 
+  logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
             res.send({ 'type': 'error', 'message': 'cant read' })
         } else {
             let links = data.split('\n');
@@ -533,7 +564,8 @@ exports.youtubeAdd = (req, res) => {
                 res.send({ 'type': 'warning', 'message': 'already added' })
             } else {
                 fs.appendFile(youtubePath, '\n' + link, function (err) {
-                    if (err) {
+                    if (err) { 
+  logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
                         res.send({ 'type': 'error', 'message': 'cant append' })
                     } else {
                         res.send({ 'type': 'success', 'message': 'appended' })
@@ -554,7 +586,8 @@ exports.youtubeDelete = (req, res) => {
     let link = req.body.link;
 
     fs.readFile(youtubePath, 'utf8', (err, data) => {
-        if (err) {
+        if (err) { 
+  logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
             res.send({ 'type': 'error', 'message': 'cant read' })
         } else {
             let links = data.split('\n');
@@ -564,7 +597,8 @@ exports.youtubeDelete = (req, res) => {
                     links.splice(index, 1);
                 }
                 fs.writeFile(youtubePath, links.join('\n'), function (err) {
-                    if (err) {
+                    if (err) { 
+  logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
                         res.send({ 'type': 'error', 'message': 'cant delete' });
                     }
                     res.send({ 'type': 'success', 'message': 'link removed' });
@@ -586,7 +620,8 @@ exports.youtubeDelete = (req, res) => {
 // exports.twitterStartNow = (req, res) => {
 //     let keyword = req.body.keyword;
 //     exec('python3 '+twitterScraperScriptPath + ' ' + keyword, (err, stdout, stderr) => {
-//         if (err) {
+//         if (err) { 
+  logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
 //             res.send({ 'type': 'error', 'message': 'Can not start at the moment!' });
 //             return;
 //         }
@@ -599,7 +634,8 @@ exports.youtubeDelete = (req, res) => {
 //     let keyword = req.body.keyword;
 
 //     exec('cat *.js bad_file | wc -l', (err, stdout, stderr) => {
-//         if (err) {
+//         if (err) { 
+  logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
 //             res.send({ 'type': 'error', 'message': 'Can not start at the moment!' });
 //             return;
 //         }
