@@ -863,7 +863,7 @@ exports.facebookKeywordLiveSearch = (req, res) => {
     if (_ip == undefined){
         _ip = results["en0"];
     }
-    _ip = _ip[0];
+    // _ip = _ip[0];
 
     request({
         url: 'http://127.0.0.1:3555/api/post',
