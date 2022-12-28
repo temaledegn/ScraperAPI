@@ -866,7 +866,7 @@ exports.facebookKeywordLiveSearch = (req, res) => {
     _ip = _ip[0];
 
     request({
-        url: 'http://' +_ip+":3555/api/post",
+        url: 'http://127.0.0.1:3555/api/post',
         method: "POST",
         json: true,
         body: {"id":query}
