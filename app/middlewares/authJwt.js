@@ -28,6 +28,11 @@ verifyToken = (req, res, next) => {
  */
 isAdmin = (req, res, next) => {
   User.findById(req.userId).exec((err, user) => {
+    if (user == null){
+      res.status(403).send({ message: "Invalid Token!" });
+      return;
+    }
+
     if (err) {
       res.status(500).send({ message: err });
       return;
