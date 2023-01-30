@@ -185,15 +185,11 @@ exports.twitterSearch = (req, res) => {
             var dbo = db.db("twitter-data");
             dbo
                 .collection("twitter")
-                .findOne({ UserName: sq },
-                    function (err, result) {
-                         if (err) {
-                logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
-                throw err;
-            }
-                        res.send([result]);
-                        db.close();
-                    });
+                .find({UserName:sq})
+                .toArray().then((items) => {
+                    res.send(items);
+                    db.close();
+                })
         });
     } else {
         let re = new RegExp(".*" + sq + ".*", "i");
