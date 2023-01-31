@@ -136,13 +136,6 @@ exports.twitterTweets = (req, res) => {
  */
 exports.twitterSearch = (req, res) => {
     const sq = req.query.q;
-    var lmt = 3;
-    try{
-       lmt = parseInt(req.query.limit);
-    }catch(e){
-        lmt = 3;
-    }
-    
     if (sq == undefined){
         logger.warn(`${500} - ${'Search Query Not Specified'} - - ${req.originalUrl} - ${req.method} - ${req.ip}`);
         res.send('Search Query Not Specified')
@@ -184,6 +177,18 @@ exports.twitterSearch = (req, res) => {
                 });
         });
     } else if (sq.startsWith("@")) {
+        var lmt = req.query.limit;
+
+        if (req.query.limit == undefined){
+            lmt = 3;
+        }
+
+        lmt = parseInt(lmt);
+
+        if (!Number.isInteger(lmt)){
+            lmt = 3;
+        }
+        
         MongoClient.connect(uri, function (err, db) {
             if (err) {
                 logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
