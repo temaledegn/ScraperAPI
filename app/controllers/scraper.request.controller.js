@@ -25,9 +25,9 @@ const linkedinPath = homeDir + '/Desktop/osint/LinkedIn/datarequ.txt'
 const youtubePath = homeDir + '/Desktop/osint/YouTube/youtube_Scrape_/url.txt'
 
 
-const fbPageKeywordsPath = homeDir + '/Desktop/osint/Facebook/faceboook-scraper-backend/targetKeywords.txt'
-const fbUserKeywordsPath = homeDir + '/Desktop/osint/Facebook/facebook-scraper-backend-profile/targetKeywords.txt'
-const twitterKeywordsPath = homeDir + '/Desktop/osint/Twitter/twitter-scraper/Authentication/DocumentKeywords.txt'
+// const fbPageKeywordsPath = homeDir + '/Desktop/osint/Facebook/faceboook-scraper-backend/targetKeywords.txt'
+// const fbUserKeywordsPath = homeDir + '/Desktop/osint/Facebook/facebook-scraper-backend-profile/targetKeywords.txt'
+// const twitterKeywordsPath = homeDir + '/Desktop/osint/Twitter/twitter-scraper/Authentication/DocumentKeywords.txt'
 
 const twitterScraperScriptPath = '/Desktop/osint/Twitter/twitter-scraper/scraper/index.py'
 const twitterCurrentlyScrapingKeywordPath = homeDir + '/Desktop/osint/Twitter/twitter-scraper/currentlyScrapingKeyword.txt'
@@ -41,7 +41,7 @@ const twitterCurrentlyScrapingKeywordPath = homeDir + '/Desktop/osint/Twitter/tw
  */
 exports.fbUserGet = (req, res) => {
     let _type = req.query.type;
-    fs.readFile(_type == 'link' ? fbUserPath:fbUserKeywordsPath, 'utf8', (err, data) => {
+    fs.readFile(fbUserPath, 'utf8', (err, data) => {
         if (err) { 
   logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
             res.send([])
@@ -61,7 +61,7 @@ exports.fbUserAdd = (req, res) => {
     let _type = req.body.type;
     let entry =  _type == 'link' ? req.body.link:req.body.keyword;
     
-    fs.readFile(_type == 'link' ? fbUserPath:fbUserKeywordsPath, 'utf8', (err, data) => {
+    fs.readFile(fbUserPath, 'utf8', (err, data) => {
         if (err) { 
             logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
             res.send({ 'type': 'error', 'message': 'cant read' })
@@ -70,7 +70,7 @@ exports.fbUserAdd = (req, res) => {
             if (links.includes(entry)) {
                 res.send({ 'type': 'warning', 'message': 'already added' })
             } else {
-                fs.appendFile(_type == 'link' ? fbUserPath:fbUserKeywordsPath, '\n' + entry, function (err) {
+                fs.appendFile(fbUserPath, '\n' + entry, function (err) {
                    if (err) { 
                         logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
                         res.send({ 'type': 'error', 'message': 'cant append' })
@@ -93,7 +93,7 @@ exports.fbUserDelete = (req, res) => {
     let _type = req.body.type;
     let entry =  _type == 'link' ? req.body.link:req.body.keyword;
 
-    fs.readFile(_type == 'link' ? fbUserPath:fbUserKeywordsPath, 'utf8', (err, data) => {
+    fs.readFile(fbUserPath, 'utf8', (err, data) => {
         if (err) { 
   logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
             res.send({ 'type': 'error', 'message': 'cant read' })
@@ -104,7 +104,7 @@ exports.fbUserDelete = (req, res) => {
                 if (index > -1) {
                     links.splice(index, 1);
                 }
-                fs.writeFile(_type == 'link' ? fbUserPath:fbUserKeywordsPath, links.join('\n'), function (err) {
+                fs.writeFile(fbUserPath, links.join('\n'), function (err) {
                     if (err) { 
   logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
                         res.send({ 'type': 'error', 'message': 'cant delete' });
@@ -128,7 +128,7 @@ exports.fbUserDelete = (req, res) => {
  */
 exports.fbPageGet = (req, res) => {
     let _type = req.query.type;
-    fs.readFile(_type == 'link' ? fbPagePath : fbPageKeywordsPath, 'utf8', (err, data) => {
+    fs.readFile(fbPagePath, 'utf8', (err, data) => {
         if (err) { 
   logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
             res.send([])
@@ -147,7 +147,7 @@ exports.fbPageGet = (req, res) => {
 exports.fbPageAdd = (req, res) => {
     let _type = req.body.type;
     let entry = _type == 'link' ? req.body.link : req.body.keyword;
-    fs.readFile(_type == 'link' ? fbPagePath : fbPageKeywordsPath, 'utf8', (err, data) => {
+    fs.readFile(fbPagePath, 'utf8', (err, data) => {
         if (err) { 
   logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
             res.send({ 'type': 'error', 'message': 'cant read' })
@@ -156,7 +156,7 @@ exports.fbPageAdd = (req, res) => {
             if (links.includes(entry)) {
                 res.send({ 'type': 'warning', 'message': 'already added' })
             } else {
-                fs.appendFile(_type == 'link' ? fbPagePath : fbPageKeywordsPath, '\n' + entry, function (err) {
+                fs.appendFile(fbPagePath, '\n' + entry, function (err) {
                     if (err) { 
   logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
                         res.send({ 'type': 'error', 'message': 'cant append' })
@@ -178,7 +178,7 @@ exports.fbPageDelete = (req, res) => {
     let _type = req.body.type;
     let entry = _type == 'link' ? req.body.link : req.body.keyword;
     
-    fs.readFile(_type == 'link' ? fbPagePath : fbPageKeywordsPath, 'utf8', (err, data) => {
+    fs.readFile(fbPagePath, 'utf8', (err, data) => {
         if (err) { 
   logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
             res.send({ 'type': 'error', 'message': 'cant read' })
@@ -189,7 +189,7 @@ exports.fbPageDelete = (req, res) => {
                 if (index > -1) {
                     links.splice(index, 1);
                 }
-                fs.writeFile(_type == 'link' ? fbPagePath : fbPageKeywordsPath, links.join('\n'), function (err) {
+                fs.writeFile(fbPagePath, links.join('\n'), function (err) {
                     if (err) { 
   logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
                         res.send({ 'type': 'error', 'message': 'cant delete' });
@@ -218,7 +218,7 @@ exports.fbPageDelete = (req, res) => {
  */
 exports.twitterGet = (req, res) => {
     let _type = req.query.type;
-    fs.readFile(_type == 'username'? twitterPath:twitterKeywordsPath, 'utf8', (err, data) => {
+    fs.readFile(twitterPath, 'utf8', (err, data) => {
         if (err) { 
   logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
             res.send([])
@@ -236,7 +236,7 @@ exports.twitterGet = (req, res) => {
 exports.twitterAdd = (req, res) => {
     let _type = req.body.type;
     let entry = _type == 'username' ? req.body.username:req.body.keyword;
-    fs.readFile(_type == 'username'? twitterPath:twitterKeywordsPath, 'utf8', (err, data) => {
+    fs.readFile(twitterPath, 'utf8', (err, data) => {
         if (err) { 
   logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
             res.send({ 'type': 'error', 'message': 'cant read' })
@@ -246,7 +246,7 @@ exports.twitterAdd = (req, res) => {
             if (usernames.includes(entry)) {
                 res.send({ 'type': 'warning', 'message': 'already added' })
             } else {
-                fs.appendFile(_type == 'username'? twitterPath:twitterKeywordsPath, '\n' + entry, function (err) {
+                fs.appendFile(twitterPath, '\n' + entry, function (err) {
                     if (err) { 
   logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
                         res.send({ 'type': 'error', 'message': 'cant append' })
@@ -267,7 +267,7 @@ exports.twitterAdd = (req, res) => {
 exports.twitterDelete = (req, res) => {
     let _type = req.body.type;
     let entry = _type == 'username' ? req.body.username:req.body.keyword;
-    fs.readFile(_type == 'username'? twitterPath:twitterKeywordsPath, 'utf8', (err, data) => {
+    fs.readFile(twitterPath, 'utf8', (err, data) => {
         if (err) { 
   logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
             res.send({ 'type': 'error', 'message': 'cant read' })
@@ -278,7 +278,7 @@ exports.twitterDelete = (req, res) => {
                 if (index > -1) {
                     usernames.splice(index, 1);
                 }
-                fs.writeFile(_type == 'username'? twitterPath:twitterKeywordsPath, usernames.join('\n'), function (err) {
+                fs.writeFile(twitterPath, usernames.join('\n'), function (err) {
                     if (err) { 
   logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
                         res.send({ 'type': 'error', 'message': 'cant delete' });
