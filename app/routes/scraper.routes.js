@@ -41,6 +41,7 @@ module.exports = function (app) {
   app.get("/facebook/page/posts/:date_doc_id/:page_doc_id", [cors(), authJwt.verifyToken, authJwt.isAdmin], controller.fbPagePosts);
 
   app.get("/facebook/page/all-posts", [cors(), authJwt.verifyToken, authJwt.isAdmin], controller.fbPageAllPosts);
+  app.get("/facebook/user/all-posts", [cors(), authJwt.verifyToken, authJwt.isAdmin], controller.fbUserAllPosts);
 
   // app.get("/facebook/page/comments/:date_doc_id/:user_doc_id/:post_doc_id", [cors(), authJwt.verifyToken, authJwt.isAdmin], controller.fbPageComments);
 

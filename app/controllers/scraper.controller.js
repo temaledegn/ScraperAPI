@@ -129,6 +129,25 @@ exports.fbUserPosts = (req, res) => {
 }
 
 
+exports.fbUserAllPosts = (req, res) => {
+    MongoClient.connect(uri, { useUnifiedTopology: true }, function (err, db) {
+        if (err) {
+               logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+               throw err;
+           }
+       var dbo = db.db("facebook-data");
+       dbo
+           .collection("postofusers")
+           .find({}, { projection: { comments: 0 } })
+           .toArray()
+           .then((items) => {
+               res.send(items);
+               db.close();
+           });
+   });
+}
+
+
 /**
  * Returns response containing the dates that the scraper collected data on.
  * @param {Request} req The request object 
