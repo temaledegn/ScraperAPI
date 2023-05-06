@@ -24,7 +24,7 @@ const logConfiguration = {
 const logger = winston.createLogger(logConfiguration);
 
 const uri =
-    "mongodb://localhost:27017/?readPreference=primary&appname=MongoDB%20Compass&ssl=false";
+    "mongodb://127.0.0.1:27017/?readPreference=primary&appname=MongoDB%20Compass&ssl=false";
 
 // Action Request
 
@@ -33,6 +33,214 @@ exports.actionRequest = (req, res) => {
 }
 
 // End Action Request
+
+
+
+/* ************************************* */
+/* **********   FACEBOOK     *********** */
+/* ************************************* */
+
+/**
+ * Returns response containing the dates that the scraper collected data on.
+ * @param {Request} req The request object 
+ * @param {Response} res Response object for the request
+ */
+exports.fbUserDates = (req, res) => {  MongoClient.connect(uri, function (err, db) {
+    MongoClient.connect(uri, function (err, db) {
+        if (err) {
+            logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+            throw err;
+        }
+        var dbo = db.db("facebook-data");
+        dbo
+            .collection("userscollections")
+            .find({}, { projection: { users: 0 } })
+            .toArray()
+            .then((items) => {
+                res.send(items);
+                db.close();
+            });
+    });
+});
+}
+
+
+/**
+ * Returns response containing the dates that the scraper collected data on.
+ * @param {Request} req The request object which should contain document id the desired date resides on
+ * @param {Response} res Response object for the request
+ */
+exports.fbUserUsers = (req, res) => {
+    if (req.params.date_doc_id.length != 24){
+        res.send({message:'Invalid document ID!'});
+        return;
+    }
+    MongoClient.connect(uri, function (err, db) {
+        if (err) {
+               logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+               throw err;
+           }
+       var dbo = db.db("facebook-data");
+       dbo
+           .collection("userscollections")
+           .findOne(
+               { _id: MongoClient.ObjectId(req.params.date_doc_id) },
+               { projection: { 'users.posts': 0 } },
+               function (err, result) {
+                    if (err) {
+                        logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+                        throw err;
+                    }
+                   res.send(result);
+                   db.close();
+               }
+           );
+   });
+}
+
+
+/**
+ * Returns response containing the dates that the scraper collected data on.
+ * @param {Request} req The request object which should contain the the document ID the date resides on and the document ID the user resides on 
+ * @param {Response} res Response object for the request
+ */
+exports.fbUserPosts = (req, res) => {
+    MongoClient.connect(uri, { useUnifiedTopology: true }, function (err, db) {
+        if (err) {
+               logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+               throw err;
+           }
+       var dbo = db.db("facebook-data");
+       dbo
+           .collection("userscollections")
+           .findOne(
+               { _id: MongoClient.ObjectId(req.params.date_doc_id), 'users._id':MongoClient.ObjectId(req.params.user_doc_id) },
+               { projection: {'users.posts.$':1, }},
+               function (err, result) {
+                    if (err) {
+                        logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+                        throw err;
+                    }
+                   res.send(result);
+                   db.close();
+               }
+           );
+   });
+}
+
+
+/**
+ * Returns response containing the dates that the scraper collected data on.
+ * @param {Request} req The request object 
+ * @param {Response} res Response object for the request
+ */
+exports.fbPageDates = (req, res) => {  MongoClient.connect(uri, function (err, db) {
+    MongoClient.connect(uri, function (err, db) {
+        if (err) {
+            logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+            throw err;
+        }
+        var dbo = db.db("facebook-data");
+        dbo
+            .collection("groupscollections")
+            .find({}, { projection: { groups: 0 } })
+            .toArray()
+            .then((items) => {
+                res.send(items);
+                db.close();
+            });
+    });
+});
+}
+
+
+/**
+ * Returns response containing the dates that the scraper collected data on.
+ * @param {Request} req The request object which should contain document id the desired date resides on
+ * @param {Response} res Response object for the request
+ */
+exports.fbPagePages = (req, res) => {
+    if (req.params.date_doc_id.length != 24){
+        res.send({message:'Invalid document ID!'});
+        return;
+    }
+    
+    MongoClient.connect(uri, function (err, db) {
+        if (err) {
+               logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+               throw err;
+           }
+       var dbo = db.db("facebook-data");
+       dbo
+           .collection("groupscollections")
+           .findOne(
+               { _id: MongoClient.ObjectId(req.params.date_doc_id) },
+               { projection: { 'groups.posts': 0 } },
+               function (err, result) {
+                    if (err) {
+                        logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+                        throw err;
+                    }
+                   res.send(result);
+                   db.close();
+               }
+           );
+   });
+}
+
+
+
+/**
+ * Returns response containing the dates that the scraper collected data on.
+ * @param {Request} req The request object which should contain document id for date and document id for a page/group
+ * @param {Response} res Response object for the request
+ */
+exports.fbPagePosts = (req, res) => {
+    MongoClient.connect(uri, { useUnifiedTopology: true }, function (err, db) {
+        if (err) {
+               logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+               throw err;
+           }
+       var dbo = db.db("facebook-data");
+       dbo
+           .collection("groupscollections")
+           .findOne(
+               { _id: MongoClient.ObjectId(req.params.date_doc_id), 'groups._id':MongoClient.ObjectId(req.params.page_doc_id) },
+               { projection: {'groups.posts.$':1, }},
+               function (err, result) {
+                    if (err) {
+                        logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+                        throw err;
+                    }
+                   res.send(result);
+                   db.close();
+               }
+           );
+   });
+}
+
+exports.fbPageAllPosts = (req, res) => {
+    MongoClient.connect(uri, { useUnifiedTopology: true }, function (err, db) {
+        if (err) {
+               logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+               throw err;
+           }
+       var dbo = db.db("facebook-data");
+       dbo
+           .collection("posts")
+           .find({}, { projection: { comments: 0 } })
+           .toArray()
+           .then((items) => {
+               res.send(items);
+               db.close();
+           });
+   });
+}
+
+/* ************************************* */
+/* ********  END FACEBOOK      ********* */
+/* ************************************* */
+
 
 
 

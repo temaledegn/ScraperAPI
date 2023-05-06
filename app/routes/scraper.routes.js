@@ -17,6 +17,36 @@ module.exports = function (app) {
 
 
   /* ************************************* */
+  /* **********   FACEBOOK      *********** */
+  /* ************************************* */
+
+  app.get("/facebook/user/dates", [cors(), authJwt.verifyToken, authJwt.isAdmin], controller.fbUserDates);
+
+
+  app.get("/facebook/user/users/:date_doc_id", [cors(), authJwt.verifyToken, authJwt.isAdmin], controller.fbUserUsers);
+
+
+  app.get("/facebook/user/posts/:date_doc_id/:user_doc_id", [cors(), authJwt.verifyToken, authJwt.isAdmin], controller.fbUserPosts);
+
+
+  // app.get("/facebook/user/comments/:date_doc_id/:user_doc_id/:post_doc_id", [cors(), authJwt.verifyToken, authJwt.isAdmin], controller.fbUserComments);
+
+
+  app.get("/facebook/page/dates", [cors(), authJwt.verifyToken, authJwt.isAdmin], controller.fbPageDates);
+
+
+  app.get("/facebook/page/pages/:date_doc_id", [cors(), authJwt.verifyToken, authJwt.isAdmin], controller.fbPagePages);
+  
+
+  app.get("/facebook/page/posts/:date_doc_id/:page_doc_id", [cors(), authJwt.verifyToken, authJwt.isAdmin], controller.fbPagePosts);
+
+  app.get("/facebook/page/all-posts", [cors(), authJwt.verifyToken, authJwt.isAdmin], controller.fbPageAllPosts);
+
+  // app.get("/facebook/page/comments/:date_doc_id/:user_doc_id/:post_doc_id", [cors(), authJwt.verifyToken, authJwt.isAdmin], controller.fbPageComments);
+
+
+
+  /* ************************************* */
   /* **********   TWITTER      *********** */
   /* ************************************* */
 
