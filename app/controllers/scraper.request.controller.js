@@ -19,7 +19,7 @@ const logger = winston.createLogger(logConfiguration);
 
 const telegramPath = homeDir + '/Desktop/osint/Telegram/Telegram/data.json'
 const fbPagePath = homeDir + '/Desktop/osint/Facebook/facebook-posts/target.txt'
-const fbUserPath = homeDir + '/Desktop/osint/Facebook/posts-user/target.txt'
+const fbUserPath = homeDir + '/Desktop/osint/Facebook/posts-users/target.txt'
 const twitterPath = homeDir + '/Desktop/osint/Twitter/twitter-scraper/Authentication/Document.txt'
 const linkedinPath = homeDir + '/Desktop/osint/LinkedIn/datarequ.txt'
 const youtubePath = homeDir + '/Desktop/osint/YouTube/youtube_Scrape_/url.txt'

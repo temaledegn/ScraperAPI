@@ -137,7 +137,7 @@ exports.fbUserAllPosts = (req, res) => {
            }
        var dbo = db.db("facebook-data");
        dbo
-           .collection("postofusers")
+           .collection("postsofusers")
            .find({}, { projection: { comments: 0 } })
            .toArray()
            .then((items) => {
