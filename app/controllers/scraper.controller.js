@@ -10,6 +10,7 @@ var request = require('request');
 const winston =  require('winston');
 
 const { networkInterfaces } = require('os');
+const { collection } = require("../models/user.model");
 
 const nets = networkInterfaces();
 
@@ -1038,17 +1039,49 @@ function os_func() {
  */
 exports.twitterKeywordLiveSearch = (req, res) => {
 
-    const twitterScriptPath = homeDir + '/Desktop/osint/Twitter/twitter-scraper/Scraper/index_keyword.py'
-    
-    var query = req.body.keyword;
-    var responseContent = [];
+    const keywordScript = homeDir + '/Desktop/osint/Twitter/twitter-scraper/Scraper/index_keyword_new.py'
+    const usernameScript = homeDir + '/Desktop/osint/Twitter/twitter-scraper/Scraper/index_new.py'
+    const filterAccountScript = homeDir + '/Desktop/osint/Twitter/twitter-scraper/Scraper/filter_account.py'
+   
+    var type = req.body.type;
+    var query = '';
+    var scriptPath = '';
+    var collectionName = '';
+
+    if (type == undefined){
+        res.send({
+            "status" : "failed",
+            "message": "Type is required!",
+            "data" : []
+        });
+        return;
+    } else if (type == 'keyword'){
+        query = req.body.keyword;
+        scriptPath = keywordScript;
+        collectionName = 'keyword';
+    }else if (type == 'username'){
+        query = req.body.keyword;
+        scriptPath = usernameScript;
+        collectionName = 'twitter';
+    }else if (type == 'name'){
+        query = req.body.name;
+        scriptPath = filterAccountScript;
+        collectionName = 'account_info';
+    }else{
+        res.send({
+            "status" : "failed",
+            "message": "Invalid Type!",
+            "data" : []
+        });
+        return;
+    }
  
     var startTimestamp = new Date();
     startTimestamp.setTime(startTimestamp.getTime()+3*3600*1000);
     var os = new os_func();
 
     // os.execCommand('ls').then(resp=> {
-        os.execCommand('/usr/bin/python3 '+twitterScriptPath+' "'+query+'"').then(resp=> {
+        os.execCommand('/usr/bin/python3 '+scriptPath+' "'+query+'"').then(resp=> {
             MongoClient.connect(uri, function (err, db) {
                     if (err) {
             logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
@@ -1056,8 +1089,8 @@ exports.twitterKeywordLiveSearch = (req, res) => {
         }
                 var dbo = db.db("twitter-data");
                 dbo
-                    .collection("twitter-keyword")
-                    .find({ Date_of_Scraping: {$gt : startTimestamp}, 'Keyword':query})
+                    .collection(collectionName)
+                    .find({ Date_of_Scraping: {$gt : startTimestamp}})
                     .toArray()
                     .then((items) => {
                         res.send(items);
@@ -1079,7 +1112,51 @@ exports.twitterKeywordLiveSearch = (req, res) => {
  * @param {Response} res The response object
  */
 exports.facebookKeywordLiveSearch = (req, res) => {
-    var query = req.body.id;
+    var query = req.body.q;
+    var type = req.body.type;
+
+    if (type == 'name'){
+        res.send({
+            status: "success", 
+            data: [
+                {
+                    name: "Getachew Assefa",
+                    info: "14K followers",
+                    profile_link : "https://www.facebook.com/getachew.UMDMedia"
+                },
+                {
+                    name: "Getachew Asefa",
+                    info: "Works at University of Toronto · University of Toronto · Lives in Toronto, Ontario",
+                    profile_link : "https://www.facebook.com/getachew.asefa.14473"
+                },
+                {
+                    name: "Getachew Assefa",
+                    info: "Addis Ababa University · Lives in Addis Ababa, Ethiopia · 34 followers",
+                    profile_link : "https://www.facebook.com/getachew.assefa.756"
+                },
+            ]
+        })
+    }else if (type == 'user-id-'){
+
+    }else if (type == 'keyword' || type == 'user-id'){
+        res.send(
+            {"_id":{"$oid":"646359c69fe64546009bc029"},"postContent":"ይሄ ሁሉ ተወርቶ እናትየው ላሽ ቢሉትስ?\nSee Translation","numberOfLikes":"16","postImage":"","timeOfPost":"April 15 at 6:46 PM · ","numberOfComments":"7 comments","numberOfShares":"1 Comment","postSentiment":"","aboutPoster":[{"WORK":"The Review Corner on Afro FM 105.3\nHost/Producer\nJanuary 12, 2018 - Present\nAddis Ababa, Ethiopia\nHost and producer of the weekly radio show on books and movies on Afro FM 105.3.\nMacsheb PLC\nMaintenance and Sales Engineer\nAddis Ababa, Ethiopia\nManchester United\nMECHANICAL ENGINEERING STUDENT"},{"EDUCATION":"AAIT\nMechanical engineering\nClass of 2014\nAddis Ababa University Institute of Technology\nCollege\nClass of 2014\n5ki\nMechanical engineering\nSOT\nHigh school"},{"PLACES LIVED":"Addis Ababa, Ethiopia\nCurrent city\nAddis Ababa, Ethiopia\nHometown"},{"CONTACT INFO":"/abrham.b.negash\nFacebook"},{"BASIC INFO":"Male\nGender\nEnglish language\nLanguages"},{"OTHER NAMES":"El Jeffe\nNickname\nAbri tu\nNickname"},{"FAMILY MEMBERS":"Eden Legesse\nSister\nAdonay Negash\nBrother\nAdiam Negash\nSister"},{"ABOUT ABRAHAM":"I'm nt z best but i always try my best.\nI was born 2 b true, not 2 b perfect"},{"LIFE EVENTS":""},{"FAVORITE QUOTES":"But we have this treasure in jars of clay to\nshow that this all-surpassing power is from\nGod and not from us. We are hard\npressed on every side, but not crushed;\nperplexed, but not in despair;\npersecuted, but not abandoned; struck\ndown, but not destroyed.\nCorinthians 4:7-11"},{},{},{},{},{},{},{},{},{},{}],"comments":[{"_id":{"$oid":"646359c69fe64546009bc02a"},"commentContent":"","commenterName":"","commentorId":"","commentSentiment":""}],"__v":0}
+        )
+    }else if (type == undefined){
+        res.send({
+            "status" : "failed",
+            "message": "Type is required!",
+            "data" : []
+        });
+    }else{
+        res.send({
+            "status" : "failed",
+            "message": "Invalid Type!",
+            "data" : []
+        });
+    }
+
+
     const results = Object.create(null);
 
     for (const name of Object.keys(nets)) {
