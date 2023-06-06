@@ -43,6 +43,8 @@ module.exports = function (app) {
   app.get("/facebook/page/all-posts", [cors(), authJwt.verifyToken, authJwt.isAdmin], controller.fbPageAllPosts);
   app.get("/facebook/user/all-posts", [cors(), authJwt.verifyToken, authJwt.isAdmin], controller.fbUserAllPosts);
 
+  app.get("/facebook/live-search", [cors(), authJwt.verifyToken, authJwt.isAdmin], controller.facebookLiveSearch);
+
   // app.get("/facebook/page/comments/:date_doc_id/:user_doc_id/:post_doc_id", [cors(), authJwt.verifyToken, authJwt.isAdmin], controller.fbPageComments);
 
 
@@ -61,6 +63,8 @@ module.exports = function (app) {
 
 
   app.get("/twitter/search/", [cors(), authJwt.verifyToken, authJwt.isAdmin], controller.twitterSearch);
+
+  app.get("/twitter/live-search/", [cors(), authJwt.verifyToken, authJwt.isAdmin], controller.twitterLiveSearch);
 
   /* ************************************* */
   /* **********   TELEGRAM     *********** */

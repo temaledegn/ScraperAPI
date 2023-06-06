@@ -1037,7 +1037,7 @@ function os_func() {
  * @param {Request} req The request object containing the search query 
  * @param {Response} res The response object to contian the matched results
  */
-exports.twitterKeywordLiveSearch = (req, res) => {
+exports.twitterLiveSearch = (req, res) => {
 
     const keywordScript = homeDir + '/Desktop/osint/Twitter/twitter-scraper/Scraper/index_keyword_new.py'
     const usernameScript = homeDir + '/Desktop/osint/Twitter/twitter-scraper/Scraper/index_new.py'
@@ -1111,37 +1111,58 @@ exports.twitterKeywordLiveSearch = (req, res) => {
  * @param {Request} req The request object containing the search query
  * @param {Response} res The response object
  */
-exports.facebookKeywordLiveSearch = (req, res) => {
+exports.facebookLiveSearch = (req, res) => {
     var query = req.body.q;
     var type = req.body.type;
 
     if (type == 'name'){
-        res.send({
-            status: "success", 
-            data: [
-                {
-                    name: "Getachew Assefa",
-                    info: "14K followers",
-                    profile_link : "https://www.facebook.com/getachew.UMDMedia"
-                },
-                {
-                    name: "Getachew Asefa",
-                    info: "Works at University of Toronto · University of Toronto · Lives in Toronto, Ontario",
-                    profile_link : "https://www.facebook.com/getachew.asefa.14473"
-                },
-                {
-                    name: "Getachew Assefa",
-                    info: "Addis Ababa University · Lives in Addis Ababa, Ethiopia · 34 followers",
-                    profile_link : "https://www.facebook.com/getachew.assefa.756"
-                },
-            ]
-        })
-    }else if (type == 'user-id-'){
+        request({
+            url: 'http://127.0.0.1:3255/api/get-users',
+            method: "POST",
+            json: true,
+            body: {"id":query}
+        }, function (error, response, body){
+            if (error){
+                logger.error(`${error.status || 500} - ${res.statusMessage} - ${error.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+            }
+            
+            res.send(response);
+        });
 
-    }else if (type == 'keyword' || type == 'user-id'){
-        res.send(
-            {"_id":{"$oid":"646359c69fe64546009bc029"},"postContent":"ይሄ ሁሉ ተወርቶ እናትየው ላሽ ቢሉትስ?\nSee Translation","numberOfLikes":"16","postImage":"","timeOfPost":"April 15 at 6:46 PM · ","numberOfComments":"7 comments","numberOfShares":"1 Comment","postSentiment":"","aboutPoster":[{"WORK":"The Review Corner on Afro FM 105.3\nHost/Producer\nJanuary 12, 2018 - Present\nAddis Ababa, Ethiopia\nHost and producer of the weekly radio show on books and movies on Afro FM 105.3.\nMacsheb PLC\nMaintenance and Sales Engineer\nAddis Ababa, Ethiopia\nManchester United\nMECHANICAL ENGINEERING STUDENT"},{"EDUCATION":"AAIT\nMechanical engineering\nClass of 2014\nAddis Ababa University Institute of Technology\nCollege\nClass of 2014\n5ki\nMechanical engineering\nSOT\nHigh school"},{"PLACES LIVED":"Addis Ababa, Ethiopia\nCurrent city\nAddis Ababa, Ethiopia\nHometown"},{"CONTACT INFO":"/abrham.b.negash\nFacebook"},{"BASIC INFO":"Male\nGender\nEnglish language\nLanguages"},{"OTHER NAMES":"El Jeffe\nNickname\nAbri tu\nNickname"},{"FAMILY MEMBERS":"Eden Legesse\nSister\nAdonay Negash\nBrother\nAdiam Negash\nSister"},{"ABOUT ABRAHAM":"I'm nt z best but i always try my best.\nI was born 2 b true, not 2 b perfect"},{"LIFE EVENTS":""},{"FAVORITE QUOTES":"But we have this treasure in jars of clay to\nshow that this all-surpassing power is from\nGod and not from us. We are hard\npressed on every side, but not crushed;\nperplexed, but not in despair;\npersecuted, but not abandoned; struck\ndown, but not destroyed.\nCorinthians 4:7-11"},{},{},{},{},{},{},{},{},{},{}],"comments":[{"_id":{"$oid":"646359c69fe64546009bc02a"},"commentContent":"","commenterName":"","commentorId":"","commentSentiment":""}],"__v":0}
-        )
+        // res.send({
+        //     status: "success", 
+        //     data: [
+        //         {
+        //             name: "Getachew Assefa",
+        //             info: "14K followers",
+        //             profile_link : "https://www.facebook.com/getachew.UMDMedia"
+        //         },
+        //         {
+        //             name: "Getachew Asefa",
+        //             info: "Works at University of Toronto · University of Toronto · Lives in Toronto, Ontario",
+        //             profile_link : "https://www.facebook.com/getachew.asefa.14473"
+        //         },
+        //         {
+        //             name: "Getachew Assefa",
+        //             info: "Addis Ababa University · Lives in Addis Ababa, Ethiopia · 34 followers",
+        //             profile_link : "https://www.facebook.com/getachew.assefa.756"
+        //         },
+        //     ]
+        // })
+    }else if (type == 'user-id-'){
+        res.send({'message':'not supported yet!'})
+    }else if (type == 'keyword'){
+        request({
+            url: 'http://127.0.0.1:3555/api/posts',
+            method: "POST",
+            json: true,
+            body: {"id":query}
+        }, function (error, response, body){
+            if (error){
+                logger.error(`${error.status || 500} - ${res.statusMessage} - ${error.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+            }
+            res.send(response);
+        });
     }else if (type == undefined){
         res.send({
             "status" : "failed",
@@ -1156,41 +1177,40 @@ exports.facebookKeywordLiveSearch = (req, res) => {
         });
     }
 
+    // const results = Object.create(null);
 
-    const results = Object.create(null);
+    // for (const name of Object.keys(nets)) {
+    //     for (const net of nets[name]) {
+    //         // Skip over non-IPv4 and internal (i.e. 127.0.0.1) addresses
+    //         // 'IPv4' is in Node <= 17, from 18 it's a number 4 or 6
+    //         const familyV4Value = typeof net.family === 'string' ? 'IPv4' : 4
+    //         if (net.family === familyV4Value && !net.internal) {
+    //             if (!results[name]) {
+    //                 results[name] = [];
+    //             }
+    //             results[name].push(net.address);
+    //         }
+    //     }
+    // }
 
-    for (const name of Object.keys(nets)) {
-        for (const net of nets[name]) {
-            // Skip over non-IPv4 and internal (i.e. 127.0.0.1) addresses
-            // 'IPv4' is in Node <= 17, from 18 it's a number 4 or 6
-            const familyV4Value = typeof net.family === 'string' ? 'IPv4' : 4
-            if (net.family === familyV4Value && !net.internal) {
-                if (!results[name]) {
-                    results[name] = [];
-                }
-                results[name].push(net.address);
-            }
-        }
-    }
+    // var _ip = results["ens192"];
+    // if (_ip == undefined){
+    //     _ip = results["en0"];
+    // }
+    // // _ip = _ip[0];
 
-    var _ip = results["ens192"];
-    if (_ip == undefined){
-        _ip = results["en0"];
-    }
-    // _ip = _ip[0];
-
-    request({
-        url: 'http://127.0.0.1:3555/api/post',
-        method: "POST",
-        json: true,
-        body: {"id":query}
-    }, function (error, response, body){
-        if (error){
-            logger.error(`${error.status || 500} - ${res.statusMessage} - ${error.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
-        }
+    // request({
+    //     url: 'http://127.0.0.1:3555/api/post',
+    //     method: "POST",
+    //     json: true,
+    //     body: {"id":query}
+    // }, function (error, response, body){
+    //     if (error){
+    //         logger.error(`${error.status || 500} - ${res.statusMessage} - ${error.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+    //     }
         
-        res.send(response);
-    });
+    //     res.send(response);
+    // });
 };
 
 
