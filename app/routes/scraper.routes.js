@@ -106,7 +106,7 @@ module.exports = function (app) {
   /* **********   GLOBAL     ************* */
   /* ************************************* */
 
-  app.post("/common/keyword/facebook-live-search/", [cors()], controller.facebookKeywordLiveSearch); 
+  app.post("/common/keyword/facebook-live-search/", [cors()], controller.facebookLiveSearch); 
 
 
   // app.get("/common/keyword/search/", [cors(), authJwt.verifyToken, authJwt.isAdmin], controller.globalKeywordSearch); 
