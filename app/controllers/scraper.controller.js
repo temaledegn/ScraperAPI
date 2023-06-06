@@ -1017,18 +1017,20 @@ exports.youtubeComments = (req, res) => {
 /**
  * Used by devs to execute command by sending request
  */
-function os_func() {
-    this.execCommand = function (cmd) {
-        return new Promise((resolve, reject)=> {
-           exec(cmd, (error, stdout, stderr) => {
-             if (error) {
-                reject(error);
-                return;
-            }
-            resolve(stdout)
-           });
-       })
-   }
+class os_func {
+    constructor() {
+        this.execCommand = function (cmd) {
+            return new Promise((resolve, reject) => {
+                exec(cmd, (error, stdout, stderr) => {
+                    if (error) {
+                        reject(error);
+                        return;
+                    }
+                    resolve(stdout);
+                });
+            });
+        };
+    }
 }
 
 
