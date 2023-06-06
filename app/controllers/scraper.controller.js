@@ -1081,12 +1081,12 @@ exports.twitterLiveSearch = (req, res) => {
     var os = new os_func();
 
     // os.execCommand('ls').then(resp=> {
-        os.execCommand('/usr/bin/python3 '+scriptPath+' "'+query+'"').then(resp=> {
+        os.execCommand('/usr/bin/python3 '+scriptPath+' "'+query+'"').then(res=> {
             MongoClient.connect(uri, function (err, db) {
-                    if (err) {
-            logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
-            throw err;
-        }
+                if (err) {
+                    logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+                    throw err;
+                }
                 var dbo = db.db("twitter-data");
                 dbo
                     .collection(collectionName)
@@ -1149,11 +1149,11 @@ exports.facebookLiveSearch = (req, res) => {
         //         },
         //     ]
         // })
-    }else if (type == 'user-id-'){
+    }else if (type == 'user-id'){
         res.send({'message':'not supported yet!'})
     }else if (type == 'keyword'){
         request({
-            url: 'http://127.0.0.1:3555/api/posts',
+            url: 'http://127.0.0.1:3555/api/post',
             method: "POST",
             json: true,
             body: {"id":query}
