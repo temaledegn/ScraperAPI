@@ -111,7 +111,7 @@ module.exports = function (app) {
 
   // app.get("/common/keyword/search/", [cors(), authJwt.verifyToken, authJwt.isAdmin], controller.globalKeywordSearch); 
   
-  app.post("/common/keyword/twitter-live-search/", [cors(), authJwt.verifyToken, authJwt.isAdmin], controller.twitterKeywordLiveSearch);
+  app.post("/common/keyword/twitter-live-search/", [cors(), authJwt.verifyToken, authJwt.isAdmin], controller.twitterKeywordSearch);
 
 
 }
