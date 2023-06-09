@@ -1,0 +1,29 @@
+/facebook/page/all-posts
+/facebook/user/all-posts
+/facebook/live-search
+  # include these in body
+  - type: [name, keyword]
+  - q: "search query"
+
+
+/twitter/user-info/:username
+/twitter/all-users/
+/twitter/tweets/:doc_id
+/twitter/search/
+  # include these in body
+  - q : "search query"
+    `@username` for tweets by specific username
+    `"@username"` for mentions
+    `search query` for query inside a tweet
+    
+/twitter/live-search/
+  # include these in body
+  - type: [keyword, name, username]
+  - [keyword, name, username] : [keyword, name, username]
+
+
+/telegram/channel/all-scraped/
+/telegram/group/all-scraped/
+/telegram/telegram-posts/:type/:doc_id
+/telegram/channel/search/
+/telegram/group/search/

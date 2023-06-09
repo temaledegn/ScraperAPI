@@ -1083,7 +1083,7 @@ exports.twitterLiveSearch = (req, res) => {
     var os = new os_func();
 
     // os.execCommand('ls').then(resp=> {
-        os.execCommand('/usr/bin/python3 '+scriptPath+' "'+query+'"').then(res=> {
+        os.execCommand('/usr/bin/python3 '+scriptPath+' "'+query+'"').then(resx=> {
             MongoClient.connect(uri, function (err, db) {
                 if (err) {
                     logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
