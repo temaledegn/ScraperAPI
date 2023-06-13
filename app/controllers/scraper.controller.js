@@ -1045,7 +1045,7 @@ exports.twitterLiveSearch = (req, res) => {
     const usernameScript = homeDir + '/Desktop/osint/Twitter/twitter-scraper/Scraper/index_new.py'
     const filterAccountScript = homeDir + '/Desktop/osint/Twitter/twitter-scraper/Scraper/filter_account.py'
    
-    var type = req.body.type;
+    var type = req.query.type;
     var query = '';
     var scriptPath = '';
     var collectionName = '';
@@ -1058,15 +1058,15 @@ exports.twitterLiveSearch = (req, res) => {
         });
         return;
     } else if (type == 'keyword'){
-        query = req.body.keyword;
+        query = req.query.keyword;
         scriptPath = keywordScript;
         collectionName = 'keyword';
     }else if (type == 'username'){
-        query = req.body.keyword;
+        query = req.query.keyword;
         scriptPath = usernameScript;
         collectionName = 'twitter';
     }else if (type == 'name'){
-        query = req.body.name;
+        query = req.query.name;
         scriptPath = filterAccountScript;
         collectionName = 'account_info';
     }else{
