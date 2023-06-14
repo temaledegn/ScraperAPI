@@ -257,6 +257,55 @@ exports.fbPageAllPosts = (req, res) => {
    });
 }
 
+
+
+/**
+ * Performs search based on search parameter in the request object and returns matching posts if any
+ * 
+ * Search query types: 
+ * @param {Request} req A request object contining the search parameter
+ * @param {Response} res A response object containing tweets matching the search query
+ */
+exports.facebookSearch = (req, res) => {
+    const sq = req.query.q;
+    const from = req.query.from;
+
+    var collectionName = '';
+    if (from == 'page'){
+        collectionName = 'posts';
+    }else if (from == 'user'){
+        collectionName = 'postsofusers'
+    }else{
+        res.send('Unknown target!')
+    }
+
+    if (sq == undefined){
+        logger.warn(`${500} - ${'Search Query Not Specified'} - - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+        res.send('Search Query Not Specified')
+    }
+    
+        let re = new RegExp(".*" + sq+ ".*", "i");
+        MongoClient.connect(uri, function (err, db) {
+            if (err) {
+                logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+                throw err;
+            }
+            var dbo = db.db("facebook-data");
+            dbo
+                .collection(collectionName)
+                .find(
+                    { postContent: { $regex: re } }
+                )
+                .toArray()
+                .then((items) => {
+                    res.send(items);
+                    db.close();
+                });
+        });
+    
+};
+
+
 /* ************************************* */
 /* ********  END FACEBOOK      ********* */
 /* ************************************* */
@@ -1114,8 +1163,8 @@ exports.twitterLiveSearch = (req, res) => {
  * @param {Response} res The response object
  */
 exports.facebookLiveSearch = (req, res) => {
-    var query = req.body.q;
-    var type = req.body.type;
+    var query = req.query.q;
+    var type = req.query.type;
 
     if (type == 'name'){
         request({

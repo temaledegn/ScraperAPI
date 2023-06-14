@@ -45,6 +45,9 @@ module.exports = function (app) {
 
   app.get("/facebook/live-search", [cors(), authJwt.verifyToken, authJwt.isAdmin], controller.facebookLiveSearch);
 
+
+  app.get("/facebook/search/", [cors(), authJwt.verifyToken, authJwt.isAdmin], controller.facebookSearch);
+
   // app.get("/facebook/page/comments/:date_doc_id/:user_doc_id/:post_doc_id", [cors(), authJwt.verifyToken, authJwt.isAdmin], controller.fbPageComments);
 
 
