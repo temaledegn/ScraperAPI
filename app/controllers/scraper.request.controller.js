@@ -22,7 +22,7 @@ const fbPagePath = homeDir + '/Desktop/osint/Facebook/facebook-posts/target.txt'
 const fbUserPath = homeDir + '/Desktop/osint/Facebook/posts-users/target.txt'
 const twitterPath = homeDir + '/Desktop/osint/Twitter/twitter-scraper/Authentication/Document.txt'
 const linkedinPath = homeDir + '/Desktop/osint/LinkedIn/datarequ.txt'
-const youtubePath = homeDir + '/Desktop/osint/YouTube/youtube_Scrape_/url.txt'
+const youtubePath = homeDir + '/Desktop/osint/YouTube/youtube_Scrape_Api/url.txt'
 
 
 // const fbPageKeywordsPath = homeDir + '/Desktop/osint/Facebook/faceboook-scraper-backend/targetKeywords.txt'
