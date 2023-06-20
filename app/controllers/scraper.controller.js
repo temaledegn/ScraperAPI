@@ -1111,7 +1111,7 @@ exports.twitterLiveSearch = (req, res) => {
         scriptPath = keywordScript;
         collectionName = 'keyword';
     }else if (type == 'username'){
-        query = req.query.keyword;
+        query = req.query.username;
         scriptPath = usernameScript;
         collectionName = 'twitter';
     }else if (type == 'name'){
