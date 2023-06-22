@@ -1212,7 +1212,7 @@ exports.facebookLiveSearch = (req, res) => {
             if (error){
                 logger.error(`${error.status || 500} - ${res.statusMessage} - ${error.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
             }
-            res.send(response);
+            res.send(response.body);
         });
     }else if (type == undefined){
         res.send({
