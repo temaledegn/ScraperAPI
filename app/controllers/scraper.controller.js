@@ -1177,7 +1177,7 @@ exports.facebookLiveSearch = (req, res) => {
                 logger.error(`${error.status || 500} - ${res.statusMessage} - ${error.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
             }
             
-            res.send(response);
+            res.send(body);
         });
 
         // res.send({
