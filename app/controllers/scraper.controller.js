@@ -1255,6 +1255,7 @@ exports.twitterLiveSearch = (req, res) => {
                     logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
                     throw err;
                 }
+                console.log('ok got here');
                 var dbo = db.db("twitter-data");
                 dbo
                     .collection(collectionName)
