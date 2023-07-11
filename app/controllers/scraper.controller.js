@@ -1211,6 +1211,9 @@ exports.twitterLiveSearch = (req, res) => {
     var scriptPath = '';
     var collectionName = '';
 
+    print(type)
+    print(query)
+    
     if (type == undefined){
         res.send({
             "status" : "failed",
