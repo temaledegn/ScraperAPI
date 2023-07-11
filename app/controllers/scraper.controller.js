@@ -1331,6 +1331,14 @@ exports.facebookLiveSearch = (req, res) => {
             if (error){
                 logger.error(`${error.status || 500} - ${res.statusMessage} - ${error.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
             }
+            if (res.body == 'Failed to get data, Try again'){
+                res.status(503);
+                res.send({
+                    "status" : "failed",
+                    "message": "Unable to fetch data at the moment. Please try again later!",
+                    "data" : []
+                });
+            }
             res.send(body);
         });
     }else if (type == undefined){
