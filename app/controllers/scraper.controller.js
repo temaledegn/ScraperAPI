@@ -1251,6 +1251,7 @@ exports.twitterLiveSearch = (req, res) => {
         os.execCommand('/usr/bin/python3 '+scriptPath+' "'+query+'"').then(resx=> {
             MongoClient.connect(uri, function (err, db) {
                 if (err) {
+                    console.log('got here')
                     logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
                     throw err;
                 }
@@ -1265,8 +1266,13 @@ exports.twitterLiveSearch = (req, res) => {
                     });
             });
     }).catch(err=> {
+        console.log('got to this error 126')
         logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
-        res.send([])
+        res.send({
+            "status" : "error",
+            "message": "Unable to scrape at the moment!",
+            "data" : []
+        });
     })
 
     
