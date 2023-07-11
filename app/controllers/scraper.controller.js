@@ -1242,6 +1242,10 @@ exports.twitterLiveSearch = (req, res) => {
     console.log(type);
     console.log(query);
 
+    let condition = {
+
+    }
+
  
     var startTimestamp = new Date();
     startTimestamp.setTime(startTimestamp.getTime()+3*3600*1000);
@@ -1259,7 +1263,9 @@ exports.twitterLiveSearch = (req, res) => {
                 var dbo = db.db("twitter-data");
                 dbo
                     .collection(collectionName)
-                    .find({ Date_of_Scraping: {$gt : startTimestamp}})
+                    .find({ Date_of_Scraping: {$gt : startTimestamp},
+                        $or:[ {'Keyword':query}, {'UserName':'@'+query}, {'Search Phrase':query} ]
+                    })
                     .toArray()
                     .then((items) => {
                         res.send(items);
