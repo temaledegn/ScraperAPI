@@ -1238,6 +1238,10 @@ exports.twitterLiveSearch = (req, res) => {
         });
         return;
     }
+
+    console.log(type);
+    console.log(query);
+
  
     var startTimestamp = new Date();
     startTimestamp.setTime(startTimestamp.getTime()+3*3600*1000);
