@@ -258,7 +258,6 @@ exports.fbPageAllPosts = (req, res) => {
 }
 
 
-
 /**
  * Performs search based on search parameter in the request object and returns matching posts if any
  * 
@@ -304,6 +303,62 @@ exports.facebookSearch = (req, res) => {
         });
     
 };
+
+
+exports.fbConfig = (req, res) => {
+    let type = req.body.type;
+
+    if (type == 'add-account'){
+        let username = req.body.username;
+        let password = req.body.password;
+
+        if (username == undefined){
+            res.send({status: 'error', message:'Username missing'});
+        }
+
+        if (password == undefined){
+            res.send({status: 'error', message:'Password missing'})
+        }
+
+    }else if (type == 'remove-account'){
+        let username = req.body.username; 
+
+        if (username == undefined){
+            res.send({status: 'error', message:'Username missing'});
+        }
+ 
+    }else if (type == 'update-account-password'){
+        let username = req.body.username;
+        let password = req.body.password;
+
+        if (username == undefined){
+            res.send({status: 'error', message:'Username missing'});
+        }
+
+        if (password == undefined){
+            res.send({status: 'error', message:'Password missing'})
+        }
+    }else if (type == 'set-scraping-interval'){
+        let interval = req.body.interval;
+
+        if (interval == undefined){
+            res.send({status: 'error', message:'Interval missing'});
+        }
+
+    }else if (type == 'set-live-search-duration'){
+        let duration = req.body.duration;
+
+        if (duration == undefined){
+            res.send({status: 'error', message:'Interval missing'});
+        }
+
+        if (!['medium', 'short', 'long'].includes(duration)){
+            res.send({status: 'error', message:'Invalid duration type'}); 
+        }
+    }else {
+        res.send({status: 'error', message:'Unknown request type'});
+    }
+}
 
 
 /* ************************************* */
@@ -547,6 +602,63 @@ exports.twitterSearch = (req, res) => {
         });
     }
 };
+
+exports.twitterConfig = (req, res) => {
+    let type = req.body.type;
+
+    if (type == 'add-account'){
+        let username = req.body.username;
+        let password = req.body.password;
+
+        if (username == undefined){
+            res.send({status: 'error', message:'Username missing'});
+        }
+
+        if (password == undefined){
+            res.send({status: 'error', message:'Password missing'})
+        }
+
+    }else if (type == 'remove-account'){
+        let username = req.body.username; 
+
+        if (username == undefined){
+            res.send({status: 'error', message:'Username missing'});
+        }
+ 
+    }else if (type == 'update-account-password'){
+        let username = req.body.username;
+        let password = req.body.password;
+
+        if (username == undefined){
+            res.send({status: 'error', message:'Username missing'});
+        }
+
+        if (password == undefined){
+            res.send({status: 'error', message:'Password missing'})
+        }
+    }else if (type == 'set-scraping-interval'){
+        let interval = req.body.interval;
+
+        if (interval == undefined){
+            res.send({status: 'error', message:'Interval missing'});
+        }
+
+    }else if (type == 'set-live-search-duration'){
+        let duration = req.body.duration;
+
+        if (duration == undefined){
+            res.send({status: 'error', message:'Interval missing'});
+        }
+
+        if (!['medium', 'short', 'long'].includes(duration)){
+            res.send({status: 'error', message:'Invalid duration type'}); 
+        }
+    }else {
+        res.send({status: 'error', message:'Unknown request type'});
+    }
+
+   
+}
 
 /* ************************************* */
 /* *********  END TWITTER      ********* */
@@ -1176,7 +1288,14 @@ exports.facebookLiveSearch = (req, res) => {
             if (error){
                 logger.error(`${error.status || 500} - ${res.statusMessage} - ${error.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
             }
-            
+            if (res.body == 'Failed to get data, Try again'){
+                res.status(503);
+                res.send({
+                    "status" : "failed",
+                    "message": "Unable to fetch data at the moment. Please try again later!",
+                    "data" : []
+                });
+            }
             res.send(body);
         });
 
