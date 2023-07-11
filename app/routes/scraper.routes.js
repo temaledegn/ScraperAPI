@@ -67,10 +67,10 @@ module.exports = function (app) {
 
   app.get("/twitter/search/", [cors(), authJwt.verifyToken, authJwt.isAdmin], controller.twitterSearch);
 
-  app.get("/twitter/live-search/", [cors(), authJwt.verifyToken, authJwt.isAdmin], controller.twitterConfig);
+  app.get("/twitter/live-search/", [cors(), authJwt.verifyToken, authJwt.isAdmin], controller.twitterLiveSearch);
 
 
-  app.post("/twitter/config/", [cors(), authJwt.verifyToken, authJwt.isAdmin], controller.twitterLiveSearch);
+  app.post("/twitter/config/", [cors(), authJwt.verifyToken, authJwt.isAdmin], controller.twitterConfig);
 
   /* ************************************* */
   /* **********   TELEGRAM     *********** */
