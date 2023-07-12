@@ -1307,6 +1307,7 @@ exports.facebookLiveSearch = (req, res) => {
                     "message": "Unable to fetch data at the moment. Please try again later!",
                     "data" : []
                 });
+                return;
             }
             res.send(body);
         });
@@ -1344,12 +1345,12 @@ exports.facebookLiveSearch = (req, res) => {
                 logger.error(`${error.status || 500} - ${res.statusMessage} - ${error.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
             }
             if (body == 'Failed to get data, Try again'){
-                res.status(503);
                 res.send({
                     "status" : "failed",
                     "message": "Unable to fetch data at the moment. Please try again later!",
                     "data" : []
                 });
+                return;
             }
             res.send(body);
         });
