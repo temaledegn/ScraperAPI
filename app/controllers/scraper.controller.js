@@ -1271,6 +1271,7 @@ exports.twitterLiveSearch = (req, res) => {
     }).catch(err=> {
         console.log('got to this error 126')
         logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+        console.log(err);
         res.send({
             "status" : "error",
             "message": "Unable to scrape at the moment!",
