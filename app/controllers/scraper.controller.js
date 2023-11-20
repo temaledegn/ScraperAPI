@@ -1060,7 +1060,9 @@ exports.youtubeComments = (req, res) => {
                 logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
                 throw err;
             }
-                    res.send(result);
+                    res.send({
+                       "comments": result[0]
+                    });
                     db.close();
                 }
             );
