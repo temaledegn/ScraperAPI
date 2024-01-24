@@ -1410,6 +1410,122 @@ exports.facebookLiveSearch = (req, res) => {
 
 
 
+exports.getInsights = (req, res) => {
+
+    MongoClient.connect(uri, async function (err, db) {
+        if (err) {
+           logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+           throw err;
+       }
+       let dbo = db.db("telegram-data");
+       let channelData =  await dbo.collection('channels').find({}).toArray();
+       let tgChannelsScSessions =channelData.length;
+       let channelUsernames = channelData.map((item) => item.channel_username);
+       let uniqueChannelUsernames = [...new Set(channelUsernames)];
+
+       let sessionCountByTGCUsername = {};
+
+       channelUsernames.forEach(item => {
+         if (!sessionCountByTGCUsername[item]) {
+            sessionCountByTGCUsername[item] = 1;
+         } else {
+            sessionCountByTGCUsername[item]++;
+         }
+       });
+
+       let tgChannelPostCount = {};
+       uniqueChannelUsernames.forEach(element => {
+            tgChannelPostCount[element] = 0;
+       });
+
+       channelData.forEach(element => {
+        tgChannelPostCount[element.channel_username] += element.data.length;
+       });
+
+       let tgChannelTotalPostCount = Object.values(tgChannelPostCount).reduce((accumulator, currentValue) => accumulator + currentValue, 0);
+       
+
+       let groupData =  await dbo.collection('groups').find({}).toArray();
+       let tgGroupsScSessions =groupData.length;
+       let groupUsernames = groupData.map((item) => item.group_username);
+       let uniqueGroupUsernames = [...new Set(groupUsernames)];
+
+       let sessionCountByTGGUsername = {};
+
+       groupUsernames.forEach(item => {
+         if (!sessionCountByTGGUsername[item]) {
+            sessionCountByTGGUsername[item] = 1;
+         } else {
+            sessionCountByTGGUsername[item]++;
+         }
+       });
+
+       let tgGroupPostCount = {};
+       uniqueGroupUsernames.forEach(element => {
+            tgGroupPostCount[element] = 0;
+       });
+
+       groupData.forEach(element => {
+        tgGroupPostCount[element.group_username] += element.group_data.length;
+       });
+
+       let tgGroupTotalPostCount = Object.values(tgGroupPostCount).reduce((accumulator, currentValue) => accumulator + currentValue, 0);
+
+
+
+
+       dbo = db.db("facebook-data");
+       let fbUserPostCount = await dbo.collection('postsofusers').countDocuments();
+       let fbPagePostCount = await dbo.collection('posts').countDocuments();
+
+
+       dbo = db.db("twitter-data");
+       let twitterScSessions = await dbo.collection('twitter').countDocuments();
+
+            res.send({
+                telegram: {
+                    channel: {
+                        scrapingSessions: tgChannelsScSessions,
+                        usernames: uniqueChannelUsernames,
+                        scrapingSessionsByUsername: sessionCountByTGCUsername,
+                        totalPostsCount: tgChannelTotalPostCount,
+                        postCountByUsername: tgChannelPostCount,
+                    },
+                    groups:{
+                        scrapingSessions: tgGroupsScSessions,
+                        usernames: uniqueGroupUsernames,
+                        scrapingSessionsByUsername: sessionCountByTGGUsername,
+                        totalPostsCount: tgGroupTotalPostCount,
+                        postCountByUsername: tgGroupPostCount,
+                    }
+                },
+                facebook: {
+                    users: {
+                        postCount: fbUserPostCount,
+                    },
+                    pages:{
+                        postCount: fbPagePostCount
+                    }
+                },
+                twitter: {
+                    scrapingSessions: fbUserPostCount,
+                }
+            });
+           
+   });
+
+
+
+    // res.send({
+    //     "status" : "failed",
+    //     "message": "Invalid Type!",
+    //     "data" : []
+    // });
+
+};
+
+
+
 
 /* ************************************* */
 /* ************  COMMON     ************ */

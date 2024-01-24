@@ -120,6 +120,9 @@ module.exports = function (app) {
   app.post("/common/keyword/twitter-live-search/", [cors(), authJwt.verifyToken, authJwt.isAdmin], controller.twitterLiveSearch);
 
 
+  app.get("/common/insights/", [cors(), authJwt.verifyToken, authJwt.isAdmin], controller.getInsights);
+
+
 }
 
 
