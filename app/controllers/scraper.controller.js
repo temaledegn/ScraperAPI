@@ -1475,8 +1475,26 @@ exports.getInsights = (req, res) => {
 
 
        dbo = db.db("facebook-data");
-       let fbUserPostCount = await dbo.collection('postsofusers').countDocuments();
-       let fbPagePostCount = await dbo.collection('posts').countDocuments();
+       let fbUserData =  await dbo.collection('postsofusers').find({}).toArray();
+       let fbPageData =  await dbo.collection('posts').find({}).toArray();
+
+       let fbUserPostCount = fbUserData.length;
+       let fbUserUsernames = fbUserData.map((item) => item.nameOfPoster);
+       let uniqueFbuserUsernames = [...new Set(fbUserUsernames)];
+
+       let fbUserPostCountsByUsername = {};
+       uniqueFbuserUsernames.forEach(element => {
+            fbUserPostCountsByUsername[element] = fbUserData.filter((item) => item.nameOfPoster == element).length;
+       });
+ 
+       let fbPagePostCount = fbPageData.length;
+       let fbPageUsernames = fbPageData.map((item) => item.nameOfPoster);
+       let uniqueFbPageUsernames = [...new Set(fbPageUsernames)];
+
+       let fbPagePostCountsByUsername = {};
+       uniqueFbPageUsernames.forEach(element => {
+            fbPagePostCountsByUsername[element] = fbPageData.filter((item) => item.nameOfPoster == element).length;
+       });
 
 
        dbo = db.db("twitter-data");
@@ -1502,9 +1520,13 @@ exports.getInsights = (req, res) => {
                 facebook: {
                     users: {
                         postCount: fbUserPostCount,
+                        usernames: uniqueFbuserUsernames,
+                        postCountByUsername: fbUserPostCountsByUsername
                     },
                     pages:{
-                        postCount: fbPagePostCount
+                        postCount: fbPagePostCount,
+                        usernames: uniqueFbPageUsernames,
+                        postCountByUsername: fbPagePostCountsByUsername
                     }
                 },
                 twitter: {
