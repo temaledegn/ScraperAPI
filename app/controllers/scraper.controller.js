@@ -1425,7 +1425,7 @@ exports.getInsights = (req, res) => {
 
        let sessionCountByTGCUsername = {};
 
-       channelUsernames.forEach(item => {
+       uniqueChannelUsernames.forEach(item => {
          if (!sessionCountByTGCUsername[item]) {
             sessionCountByTGCUsername[item] = 1;
          } else {
@@ -1452,7 +1452,7 @@ exports.getInsights = (req, res) => {
 
        let sessionCountByTGGUsername = {};
 
-       groupUsernames.forEach(item => {
+       uniqueGroupUsernames.forEach(item => {
          if (!sessionCountByTGGUsername[item]) {
             sessionCountByTGGUsername[item] = 1;
          } else {
@@ -1498,41 +1498,71 @@ exports.getInsights = (req, res) => {
 
 
        dbo = db.db("twitter-data");
-       let twitterScSessions = await dbo.collection('twitter').countDocuments();
+       let twitterData =  await dbo.collection('twitter').find({}).toArray();
+       let twitterScSessions =twitterData.length;
+       let twitterUsernames = twitterData.map((item) => item.UserName);
+       let uniqueTwitterUsernames = [...new Set(twitterUsernames)];
 
-            res.send({
-                telegram: {
-                    channel: {
-                        scrapingSessions: tgChannelsScSessions,
-                        usernames: uniqueChannelUsernames,
-                        scrapingSessionsByUsername: sessionCountByTGCUsername,
-                        totalPostsCount: tgChannelTotalPostCount,
-                        postCountByUsername: tgChannelPostCount,
-                    },
-                    groups:{
-                        scrapingSessions: tgGroupsScSessions,
-                        usernames: uniqueGroupUsernames,
-                        scrapingSessionsByUsername: sessionCountByTGGUsername,
-                        totalPostsCount: tgGroupTotalPostCount,
-                        postCountByUsername: tgGroupPostCount,
-                    }
+       let sessionCountByTwitterUsername = {};
+
+       uniqueTwitterUsernames.forEach(item => {
+         if (!sessionCountByTwitterUsername[item]) {
+            sessionCountByTwitterUsername[item] = 1;
+         } else {
+            sessionCountByTwitterUsername[item]++;
+         }
+       });
+
+       let twitterTweetCount = {};
+       uniqueTwitterUsernames.forEach(element => {
+            twitterTweetCount[element] = 0;
+       });
+
+       twitterData.forEach(element => {
+        twitterTweetCount[element.UserName] += element.tweets.length;
+       });
+
+       let twitterTotalTweetCount = Object.values(twitterTweetCount).reduce((accumulator, currentValue) => accumulator + currentValue, 0);
+
+       
+       
+        res.send({
+            telegram: {
+                channel: {
+                    scrapingSessions: tgChannelsScSessions,
+                    usernames: uniqueChannelUsernames,
+                    scrapingSessionsByUsername: sessionCountByTGCUsername,
+                    totalPostsCount: tgChannelTotalPostCount,
+                    postCountByUsername: tgChannelPostCount,
                 },
-                facebook: {
-                    users: {
-                        postCount: fbUserPostCount,
-                        usernames: uniqueFbuserUsernames,
-                        postCountByUsername: fbUserPostCountsByUsername
-                    },
-                    pages:{
-                        postCount: fbPagePostCount,
-                        usernames: uniqueFbPageUsernames,
-                        postCountByUsername: fbPagePostCountsByUsername
-                    }
-                },
-                twitter: {
-                    scrapingSessions: fbUserPostCount,
+                groups:{
+                    scrapingSessions: tgGroupsScSessions,
+                    usernames: uniqueGroupUsernames,
+                    scrapingSessionsByUsername: sessionCountByTGGUsername,
+                    totalPostsCount: tgGroupTotalPostCount,
+                    postCountByUsername: tgGroupPostCount,
                 }
-            });
+            },
+            facebook: {
+                users: {
+                    postCount: fbUserPostCount,
+                    usernames: uniqueFbuserUsernames,
+                    postCountByUsername: fbUserPostCountsByUsername
+                },
+                pages:{
+                    postCount: fbPagePostCount,
+                    usernames: uniqueFbPageUsernames,
+                    postCountByUsername: fbPagePostCountsByUsername
+                }
+            },
+            twitter: {
+                scrapingSessions: twitterScSessions,
+                usernames: uniqueTwitterUsernames,
+                scrapingSessionsByUsername: sessionCountByTwitterUsername,
+                totalTweetCount: twitterTotalTweetCount,
+                tweetCountByUsername: twitterTweetCount,
+            }
+        });
            
    });
 
