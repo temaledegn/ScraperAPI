@@ -1029,7 +1029,7 @@ exports.youtubeAllVideos = (req, res) => {
         var dbo = db.db("youtube-data");
         dbo
             .collection("youtube")
-            .find({}, { projection: { 'comments': 0, comment: 0 } })
+            .find({}, { projection: { 'Comments': 0 } })
             .toArray()
             .then((items) => {
                 res.send(items);
@@ -1054,15 +1054,15 @@ exports.youtubeComments = (req, res) => {
             .collection("youtube")
             .findOne(
                 { _id: MongoClient.ObjectId(req.params.doc_id) },
-                { projection: { "comments": 1 } },
+                { projection: { "Comments": 1 } },
                 function (err, result) {
                      if (err) {
                 logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
                 throw err;
             }
-                    res.send({
-                       "comments": result[0]
-                    });
+                    res.send(
+                       result
+                    );
                     db.close();
                 }
             );
@@ -1414,118 +1414,32 @@ exports.getInsights = (req, res) => {
 
     MongoClient.connect(uri, async function (err, db) {
         if (err) {
-           logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
-           throw err;
-       }
-       let dbo = db.db("telegram-data");
-       let channelData =  await dbo.collection('channels').find({}).toArray();
-       let tgChannelsScSessions =channelData.length;
-       let channelUsernames = channelData.map((item) => item.channel_username);
-       let uniqueChannelUsernames = [...new Set(channelUsernames)];
-
-       let sessionCountByTGCUsername = {};
-
-       uniqueChannelUsernames.forEach(item => {
-         if (!sessionCountByTGCUsername[item]) {
-            sessionCountByTGCUsername[item] = 1;
-         } else {
-            sessionCountByTGCUsername[item]++;
-         }
-       });
-
-       let tgChannelPostCount = {};
-       uniqueChannelUsernames.forEach(element => {
-            tgChannelPostCount[element] = 0;
-       });
-
-       channelData.forEach(element => {
-        tgChannelPostCount[element.channel_username] += element.data.length;
-       });
-
-       let tgChannelTotalPostCount = Object.values(tgChannelPostCount).reduce((accumulator, currentValue) => accumulator + currentValue, 0);
-       
-
-       let groupData =  await dbo.collection('groups').find({}).toArray();
-       let tgGroupsScSessions =groupData.length;
-       let groupUsernames = groupData.map((item) => item.group_username);
-       let uniqueGroupUsernames = [...new Set(groupUsernames)];
-
-       let sessionCountByTGGUsername = {};
-
-       uniqueGroupUsernames.forEach(item => {
-         if (!sessionCountByTGGUsername[item]) {
-            sessionCountByTGGUsername[item] = 1;
-         } else {
-            sessionCountByTGGUsername[item]++;
-         }
-       });
-
-       let tgGroupPostCount = {};
-       uniqueGroupUsernames.forEach(element => {
-            tgGroupPostCount[element] = 0;
-       });
-
-       groupData.forEach(element => {
-        tgGroupPostCount[element.group_username] += element.group_data.length;
-       });
-
-       let tgGroupTotalPostCount = Object.values(tgGroupPostCount).reduce((accumulator, currentValue) => accumulator + currentValue, 0);
-
-
-
-
-       dbo = db.db("facebook-data");
-       let fbUserData =  await dbo.collection('postsofusers').find({}).toArray();
-       let fbPageData =  await dbo.collection('posts').find({}).toArray();
-
-       let fbUserPostCount = fbUserData.length;
-       let fbUserUsernames = fbUserData.map((item) => item.nameOfPoster);
-       let uniqueFbuserUsernames = [...new Set(fbUserUsernames)];
-
-       let fbUserPostCountsByUsername = {};
-       uniqueFbuserUsernames.forEach(element => {
-            fbUserPostCountsByUsername[element] = fbUserData.filter((item) => item.nameOfPoster == element).length;
-       });
- 
-       let fbPagePostCount = fbPageData.length;
-       let fbPageUsernames = fbPageData.map((item) => item.nameOfPoster);
-       let uniqueFbPageUsernames = [...new Set(fbPageUsernames)];
-
-       let fbPagePostCountsByUsername = {};
-       uniqueFbPageUsernames.forEach(element => {
-            fbPagePostCountsByUsername[element] = fbPageData.filter((item) => item.nameOfPoster == element).length;
-       });
-
-
-       dbo = db.db("twitter-data");
-       let twitterData =  await dbo.collection('twitter').find({}).toArray();
-       let twitterScSessions =twitterData.length;
-       let twitterUsernames = twitterData.map((item) => item.UserName);
-       let uniqueTwitterUsernames = [...new Set(twitterUsernames)];
-
-       let sessionCountByTwitterUsername = {};
-
-       uniqueTwitterUsernames.forEach(item => {
-         if (!sessionCountByTwitterUsername[item]) {
-            sessionCountByTwitterUsername[item] = 1;
-         } else {
-            sessionCountByTwitterUsername[item]++;
-         }
-       });
-
-       let twitterTweetCount = {};
-       uniqueTwitterUsernames.forEach(element => {
-            twitterTweetCount[element] = 0;
-       });
-
-       twitterData.forEach(element => {
-        twitterTweetCount[element.UserName] += element.tweets.length;
-       });
-
-       let twitterTotalTweetCount = Object.values(twitterTweetCount).reduce((accumulator, currentValue) => accumulator + currentValue, 0);
-
-       
-       
+            logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+            throw err;
+        }
+        let dbo = db.db("telegram-data");
+        let startDate = new Date(req.query.startDate); // Get start date from client
+        let endDate = new Date(req.query.endDate); // Get end date from client
+    
+        let channelData = await dbo.collection('channels').find({date_of_scraping: {$gte: startDate, $lte: endDate}}).toArray();
+        let tgChannelsScSessions = channelData.length;
+        let channelUsernames = channelData.map((item) => item.channel_username);
+        let uniqueChannelUsernames = [...new Set(channelUsernames)];
+    
+        // Rest of the code remains the same
+    
+        dbo = db.db("facebook-data");
+        let fbUserData = await dbo.collection('postsofusers').find({dateOfTheScrape: {$gte: startDate, $lte: endDate}}).toArray();
+        let fbPageData = await dbo.collection('posts').find({dateOfTheScrape: {$gte: startDate, $lte: endDate}}).toArray();
+    
+        // Rest of the code remains the same
+    
+        dbo = db.db("twitter-data");
+        let twitterData = await dbo.collection('twitter').find({date: {$gte: startDate, $lte: endDate}}).toArray();
+        let twitterScSessions = twitterData.length;
+    
+        // Rest of the code remains the same
+    
         res.send({
             telegram: {
                 channel: {
@@ -1535,7 +1449,7 @@ exports.getInsights = (req, res) => {
                     totalPostsCount: tgChannelTotalPostCount,
                     postCountByUsername: tgChannelPostCount,
                 },
-                groups:{
+                groups: {
                     scrapingSessions: tgGroupsScSessions,
                     usernames: uniqueGroupUsernames,
                     scrapingSessionsByUsername: sessionCountByTGGUsername,
@@ -1549,7 +1463,7 @@ exports.getInsights = (req, res) => {
                     usernames: uniqueFbuserUsernames,
                     postCountByUsername: fbUserPostCountsByUsername
                 },
-                pages:{
+                pages: {
                     postCount: fbPagePostCount,
                     usernames: uniqueFbPageUsernames,
                     postCountByUsername: fbPagePostCountsByUsername
@@ -1563,8 +1477,162 @@ exports.getInsights = (req, res) => {
                 tweetCountByUsername: twitterTweetCount,
             }
         });
+    });
+    
+
+//     MongoClient.connect(uri, async function (err, db) {
+//         if (err) {
+//            logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+//            throw err;
+//        }
+//        let dbo = db.db("telegram-data");
+//        let channelData =  await dbo.collection('channels').find({}).toArray();
+//        let tgChannelsScSessions =channelData.length;
+//        let channelUsernames = channelData.map((item) => item.channel_username);
+//        let uniqueChannelUsernames = [...new Set(channelUsernames)];
+
+//        let sessionCountByTGCUsername = {};
+
+//        uniqueChannelUsernames.forEach(item => {
+//          if (!sessionCountByTGCUsername[item]) {
+//             sessionCountByTGCUsername[item] = 1;
+//          } else {
+//             sessionCountByTGCUsername[item]++;
+//          }
+//        });
+
+//        let tgChannelPostCount = {};
+//        uniqueChannelUsernames.forEach(element => {
+//             tgChannelPostCount[element] = 0;
+//        });
+
+//        channelData.forEach(element => {
+//         tgChannelPostCount[element.channel_username] += element.data.length;
+//        });
+
+//        let tgChannelTotalPostCount = Object.values(tgChannelPostCount).reduce((accumulator, currentValue) => accumulator + currentValue, 0);
+       
+
+//        let groupData =  await dbo.collection('groups').find({}).toArray();
+//        let tgGroupsScSessions =groupData.length;
+//        let groupUsernames = groupData.map((item) => item.group_username);
+//        let uniqueGroupUsernames = [...new Set(groupUsernames)];
+
+//        let sessionCountByTGGUsername = {};
+
+//        uniqueGroupUsernames.forEach(item => {
+//          if (!sessionCountByTGGUsername[item]) {
+//             sessionCountByTGGUsername[item] = 1;
+//          } else {
+//             sessionCountByTGGUsername[item]++;
+//          }
+//        });
+
+//        let tgGroupPostCount = {};
+//        uniqueGroupUsernames.forEach(element => {
+//             tgGroupPostCount[element] = 0;
+//        });
+
+//        groupData.forEach(element => {
+//         tgGroupPostCount[element.group_username] += element.group_data.length;
+//        });
+
+//        let tgGroupTotalPostCount = Object.values(tgGroupPostCount).reduce((accumulator, currentValue) => accumulator + currentValue, 0);
+
+
+
+
+//        dbo = db.db("facebook-data");
+//        let fbUserData =  await dbo.collection('postsofusers').find({}).toArray();
+//        let fbPageData =  await dbo.collection('posts').find({}).toArray();
+
+//        let fbUserPostCount = fbUserData.length;
+//        let fbUserUsernames = fbUserData.map((item) => item.nameOfPoster);
+//        let uniqueFbuserUsernames = [...new Set(fbUserUsernames)];
+
+//        let fbUserPostCountsByUsername = {};
+//        uniqueFbuserUsernames.forEach(element => {
+//             fbUserPostCountsByUsername[element] = fbUserData.filter((item) => item.nameOfPoster == element).length;
+//        });
+ 
+//        let fbPagePostCount = fbPageData.length;
+//        let fbPageUsernames = fbPageData.map((item) => item.nameOfPoster);
+//        let uniqueFbPageUsernames = [...new Set(fbPageUsernames)];
+
+//        let fbPagePostCountsByUsername = {};
+//        uniqueFbPageUsernames.forEach(element => {
+//             fbPagePostCountsByUsername[element] = fbPageData.filter((item) => item.nameOfPoster == element).length;
+//        });
+
+
+//        dbo = db.db("twitter-data");
+//        let twitterData =  await dbo.collection('twitter').find({}).toArray();
+//        let twitterScSessions =twitterData.length;
+//        let twitterUsernames = twitterData.map((item) => item.UserName);
+//        let uniqueTwitterUsernames = [...new Set(twitterUsernames)];
+
+//        let sessionCountByTwitterUsername = {};
+
+//        uniqueTwitterUsernames.forEach(item => {
+//          if (!sessionCountByTwitterUsername[item]) {
+//             sessionCountByTwitterUsername[item] = 1;
+//          } else {
+//             sessionCountByTwitterUsername[item]++;
+//          }
+//        });
+
+//        let twitterTweetCount = {};
+//        uniqueTwitterUsernames.forEach(element => {
+//             twitterTweetCount[element] = 0;
+//        });
+
+//        twitterData.forEach(element => {
+//         twitterTweetCount[element.UserName] += element.tweets.length;
+//        });
+
+//        let twitterTotalTweetCount = Object.values(twitterTweetCount).reduce((accumulator, currentValue) => accumulator + currentValue, 0);
+
+       
+       
+//         res.send({
+//             telegram: {
+//                 channel: {
+//                     scrapingSessions: tgChannelsScSessions,
+//                     usernames: uniqueChannelUsernames,
+//                     scrapingSessionsByUsername: sessionCountByTGCUsername,
+//                     totalPostsCount: tgChannelTotalPostCount,
+//                     postCountByUsername: tgChannelPostCount,
+//                 },
+//                 groups:{
+//                     scrapingSessions: tgGroupsScSessions,
+//                     usernames: uniqueGroupUsernames,
+//                     scrapingSessionsByUsername: sessionCountByTGGUsername,
+//                     totalPostsCount: tgGroupTotalPostCount,
+//                     postCountByUsername: tgGroupPostCount,
+//                 }
+//             },
+//             facebook: {
+//                 users: {
+//                     postCount: fbUserPostCount,
+//                     usernames: uniqueFbuserUsernames,
+//                     postCountByUsername: fbUserPostCountsByUsername
+//                 },
+//                 pages:{
+//                     postCount: fbPagePostCount,
+//                     usernames: uniqueFbPageUsernames,
+//                     postCountByUsername: fbPagePostCountsByUsername
+//                 }
+//             },
+//             twitter: {
+//                 scrapingSessions: twitterScSessions,
+//                 usernames: uniqueTwitterUsernames,
+//                 scrapingSessionsByUsername: sessionCountByTwitterUsername,
+//                 totalTweetCount: twitterTotalTweetCount,
+//                 tweetCountByUsername: twitterTweetCount,
+//             }
+//         });
            
-   });
+//    });
 
 
 
