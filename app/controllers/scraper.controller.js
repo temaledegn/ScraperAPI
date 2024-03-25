@@ -1636,11 +1636,7 @@ exports.getInsights = (req, res) => {
 
 
 
-    res.send({
-        "status" : "failed",
-        "message": "Invalid Type!",
-        "data" : []
-    });
+   
 
 };
 
