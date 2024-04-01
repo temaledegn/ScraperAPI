@@ -1029,7 +1029,7 @@ exports.youtubeAllVideos = (req, res) => {
         var dbo = db.db("youtube-data");
         dbo
             .collection("youtube")
-            .find({}, { projection: { 'Comments': 0 } })
+            .find({}, { projection: { 'Comments': 0 , 'comments':0} })
             .toArray()
             .then((items) => {
                 res.send(items);
@@ -1054,7 +1054,7 @@ exports.youtubeComments = (req, res) => {
             .collection("youtube")
             .findOne(
                 { _id: MongoClient.ObjectId(req.params.doc_id) },
-                { projection: { "Comments": 1 } },
+                { projection: { "Comments": 1 , 'comments': 1} },
                 function (err, result) {
                      if (err) {
                 logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
@@ -1485,6 +1485,10 @@ exports.getInsights = (req, res) => {
            logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
            throw err;
        }
+
+        let startDate = new Date(req.query.startDate); // Get start date from client
+        let endDate = new Date(req.query.endDate); // Get end date from client
+
        let dbo = db.db("telegram-data");
        let channelData =  await dbo.collection('channels').find({}).toArray();
        let tgChannelsScSessions =channelData.length;
