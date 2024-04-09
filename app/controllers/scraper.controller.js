@@ -1591,7 +1591,7 @@ exports.getInsights = (req, res) => {
        });
 
        twitterData.forEach(element => {
-        twitterTweetCount[element.UserName] += element.tweets.length;
+        twitterTweetCount[element.UserName] += (element.tweets == undefined ? 0 : element.tweets.length);
        });
 
        let twitterTotalTweetCount = Object.values(twitterTweetCount).reduce((accumulator, currentValue) => accumulator + currentValue, 0);
