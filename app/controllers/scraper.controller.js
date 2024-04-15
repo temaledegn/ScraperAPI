@@ -736,9 +736,12 @@ exports.telegramPosts = (req, res) => {
                     { _id: MongoClient.ObjectId(req.params.doc_id) },
                     function (err, result) {
                          if (err) {
-                logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
-                throw err;
-            }
+                            logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+                            throw err;
+                        }
+                        let filteredData = result.group_data.filter(item => item.message !== '');
+                        result.group_data = filteredData;
+
                         res.send(result);
                         db.close();
                     }
@@ -754,12 +757,14 @@ exports.telegramPosts = (req, res) => {
             dbo
                 .collection("channels")
                 .findOne(
-                    { _id: MongoClient.ObjectId(req.params.doc_id) },
+                    { _id: MongoClient.ObjectId(req.params.doc_id),  },
                     function (err, result) {
-                         if (err) {
-                logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
-                throw err;
-            }
+                        if (err) {
+                            logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+                            throw err;
+                        }
+                        let filteredData = result.data.filter(item => item.message !== '');
+                        result.data = filteredData;
                         res.send(result);
                         db.close();
                     }
