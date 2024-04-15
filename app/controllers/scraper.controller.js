@@ -1476,18 +1476,12 @@ exports.getInsights = (req, res) => {
            throw err;
        }
 
-        let startDate = new Date(req.query.startDate); // Get start date from client
-        let endDate = new Date(req.query.endDate); // Get end date from client
+        let startDate = new Date(req.query.startDate == undefined ? '1980-01-01' : req.query.startDate); // Get start date from client
+        let endDate = new Date(req.query.endDate == undefined ? '2099-01-01' : req.query.endDate); // Get end date from client
 
-        if (startDate == undefined || startDate == null){
-            startDate = new Date('1980-01-01');
-        }
-        if (endDate == undefined || endDate == null){
-            endDate = new Date('2099-01-01');
-        }
 
        let dbo = db.db("telegram-data");
-       let channelData =  await dbo.collection('channels').find({ date_of_scraping: {
+       let channelData =  await dbo.collection('channels').find({ date_of_scrapting: {
                                                                     $gte: startDate,
                                                                     $lte: endDate
                                                                 }}).toArray();
