@@ -1285,6 +1285,60 @@ exports.twitterLiveSearch = (req, res) => {
     
 };
 
+
+
+
+/**
+ * Performs live search for posts containing the specified search query from all platforms
+ * @param {Request} req The request object containing the search query 
+ * @param {Response} res The response object to contian the matched results
+ */
+exports.youtubeLiveSearch = (req, res) => {
+
+    const scriptPath = homeDir +  '/Desktop/osint/Twitter/twitter-scraper/YouTube/comment_scraper.py'
+
+    var link = req.query.link;
+
+    var startTimestamp = new Date();
+    startTimestamp.setTime(startTimestamp.getTime()+3*3600*1000);
+    var os = new os_func();
+
+    // os.execCommand('ls').then(resp=> {
+        os.execCommand('/usr/bin/python3 '+scriptPath+' '+link+'').then(resx=> {
+            MongoClient.connect(uri, function (err, db) {
+                if (err) {
+                    console.log('got here')
+                    logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+                    throw err;
+                }
+                // console.log('ok got here');
+                var dbo = db.db("youtube-data");
+                dbo
+                    .collection('youtube')
+                    .find({ Timestamp: {$gt : startTimestamp}, Link: link
+                    })
+                    .toArray()
+                    .then((items) => {
+                        res.send(items);
+                        db.close();
+                    });
+            });
+    }).catch(err=> {
+        console.log('got to this error 126')
+        logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+        console.log(err);
+        res.send({
+            "status" : "error",
+            "message": "Unable to scrape at the moment!",
+            "data" : []
+        });
+    })
+
+    
+    
+};
+
+
 /**
  * Initiates the facebook live search and returns the response when it'd done
  * @param {Request} req The request object containing the search query
