@@ -1479,10 +1479,10 @@ exports.getInsights = (req, res) => {
         let startDate = new Date(req.query.startDate); // Get start date from client
         let endDate = new Date(req.query.endDate); // Get end date from client
 
-        if (startDate == undefined){
+        if (startDate == undefined || startDate == null){
             startDate = new Date('1980-01-01');
         }
-        if (endDate == undefined){
+        if (endDate == undefined || endDate == null){
             endDate = new Date('2099-01-01');
         }
 
