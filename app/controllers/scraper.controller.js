@@ -1470,75 +1470,6 @@ exports.facebookLiveSearch = (req, res) => {
 
 
 exports.getInsights = (req, res) => {
-
-    // MongoClient.connect(uri, async function (err, db) {
-    //     if (err) {
-    //         logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
-    //         throw err;
-    //     }
-    //     let dbo = db.db("telegram-data");
-    //     let startDate = new Date(req.query.startDate); // Get start date from client
-    //     let endDate = new Date(req.query.endDate); // Get end date from client
-    
-    //     let channelData = await dbo.collection('channels').find({date_of_scraping: {$gte: startDate, $lte: endDate}}).toArray();
-    //     let tgChannelsScSessions = channelData.length;
-    //     let channelUsernames = channelData.map((item) => item.channel_username);
-    //     let uniqueChannelUsernames = [...new Set(channelUsernames)];
-    
-    //     // Rest of the code remains the same
-    
-    //     dbo = db.db("facebook-data");
-    //     let fbUserData = await dbo.collection('postsofusers').find({dateOfTheScrape: {$gte: startDate, $lte: endDate}}).toArray();
-    //     let fbPageData = await dbo.collection('posts').find({dateOfTheScrape: {$gte: startDate, $lte: endDate}}).toArray();
-    
-    //     // Rest of the code remains the same
-    
-    //     dbo = db.db("twitter-data");
-    //     let twitterData = await dbo.collection('twitter').find({date: {$gte: startDate, $lte: endDate}}).toArray();
-    //     let twitterScSessions = twitterData.length;
-    
-    //     // Rest of the code remains the same
-    
-    //     res.send({
-    //         telegram: {
-    //             channel: {
-    //                 scrapingSessions: tgChannelsScSessions,
-    //                 usernames: uniqueChannelUsernames,
-    //                 scrapingSessionsByUsername: sessionCountByTGCUsername,
-    //                 totalPostsCount: tgChannelTotalPostCount,
-    //                 postCountByUsername: tgChannelPostCount,
-    //             },
-    //             groups: {
-    //                 scrapingSessions: tgGroupsScSessions,
-    //                 usernames: uniqueGroupUsernames,
-    //                 scrapingSessionsByUsername: sessionCountByTGGUsername,
-    //                 totalPostsCount: tgGroupTotalPostCount,
-    //                 postCountByUsername: tgGroupPostCount,
-    //             }
-    //         },
-    //         facebook: {
-    //             users: {
-    //                 postCount: fbUserPostCount,
-    //                 usernames: uniqueFbuserUsernames,
-    //                 postCountByUsername: fbUserPostCountsByUsername
-    //             },
-    //             pages: {
-    //                 postCount: fbPagePostCount,
-    //                 usernames: uniqueFbPageUsernames,
-    //                 postCountByUsername: fbPagePostCountsByUsername
-    //             }
-    //         },
-    //         twitter: {
-    //             scrapingSessions: twitterScSessions,
-    //             usernames: uniqueTwitterUsernames,
-    //             scrapingSessionsByUsername: sessionCountByTwitterUsername,
-    //             totalTweetCount: twitterTotalTweetCount,
-    //             tweetCountByUsername: twitterTweetCount,
-    //         }
-    //     });
-    // });
-    
-
     MongoClient.connect(uri, async function (err, db) {
         if (err) {
            logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
@@ -1548,8 +1479,18 @@ exports.getInsights = (req, res) => {
         let startDate = new Date(req.query.startDate); // Get start date from client
         let endDate = new Date(req.query.endDate); // Get end date from client
 
+        if (startDate == undefined){
+            startDate = new Date('1980-01-01');
+        }
+        if (endDate == undefined){
+            endDate = new Date('2099-01-01');
+        }
+
        let dbo = db.db("telegram-data");
-       let channelData =  await dbo.collection('channels').find({}).toArray();
+       let channelData =  await dbo.collection('channels').find({ date_of_scraping: {
+                                                                    $gte: startDate,
+                                                                    $lte: endDate
+                                                                }}).toArray();
        let tgChannelsScSessions =channelData.length;
        let channelUsernames = channelData.map((item) => item.channel_username);
        let uniqueChannelUsernames = [...new Set(channelUsernames)];
@@ -1576,7 +1517,10 @@ exports.getInsights = (req, res) => {
        let tgChannelTotalPostCount = Object.values(tgChannelPostCount).reduce((accumulator, currentValue) => accumulator + currentValue, 0);
        
 
-       let groupData =  await dbo.collection('groups').find({}).toArray();
+       let groupData =  await dbo.collection('groups').find({date_of_scrapting: {
+                                                                $gte: startDate,
+                                                                $lte: endDate
+                                                            }}).toArray();
        let tgGroupsScSessions =groupData.length;
        let groupUsernames = groupData.map((item) => item.group_username);
        let uniqueGroupUsernames = [...new Set(groupUsernames)];
@@ -1629,7 +1573,10 @@ exports.getInsights = (req, res) => {
 
 
        dbo = db.db("twitter-data");
-       let twitterData =  await dbo.collection('twitter').find({}).toArray();
+       let twitterData =  await dbo.collection('twitter').find({Date_of_Scraping: {
+                                                                    $gte: startDate,
+                                                                    $lte: endDate
+                                                                }}).toArray();
        let twitterScSessions =twitterData.length;
        let twitterUsernames = twitterData.map((item) => item.UserName);
        let uniqueTwitterUsernames = [...new Set(twitterUsernames)];
