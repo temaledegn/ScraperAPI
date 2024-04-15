@@ -739,7 +739,7 @@ exports.telegramPosts = (req, res) => {
                             logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
                             throw err;
                         }
-                        let filteredData = result.group_data.filter(item => item.message !== '');
+                        let filteredData = result.group_data.filter(item => item.Message !== '');
                         result.group_data = filteredData;
 
                         res.send(result);
@@ -763,7 +763,7 @@ exports.telegramPosts = (req, res) => {
                             logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
                             throw err;
                         }
-                        let filteredData = result.data.filter(item => item.message !== '');
+                        let filteredData = result.data.filter(item => item.Message !== '');
                         result.data = filteredData;
                         res.send(result);
                         db.close();
