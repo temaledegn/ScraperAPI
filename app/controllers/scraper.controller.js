@@ -739,8 +739,8 @@ exports.telegramPosts = (req, res) => {
                             logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
                             throw err;
                         }
-                        let filteredData = result.group_data.filter(item => item.message !== '');
-                        result.group_data = filteredData;
+                        // let filteredData = result.group_data.filter(item => item.message !== '');
+                        // result.group_data = filteredData;
 
                         res.send(result);
                         db.close();
@@ -763,8 +763,8 @@ exports.telegramPosts = (req, res) => {
                             logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
                             throw err;
                         }
-                        let filteredData = result.data.filter(item => item.message !== '');
-                        result.data = filteredData;
+                        // let filteredData = result.data.filter(item => item.message !== '');
+                        // result.data = filteredData;
                         res.send(result);
                         db.close();
                     }
