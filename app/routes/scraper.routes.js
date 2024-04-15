@@ -113,6 +113,7 @@ module.exports = function (app) {
   /* ************************************* */
 
   app.post("/common/keyword/facebook-live-search/", [cors()], controller.facebookLiveSearch); 
+  app.post("/common/youtube-live-search/", [cors()], controller.youtubeLiveSearch); 
 
 
   // app.get("/common/keyword/search/", [cors(), authJwt.verifyToken, authJwt.isAdmin], controller.globalKeywordSearch); 
