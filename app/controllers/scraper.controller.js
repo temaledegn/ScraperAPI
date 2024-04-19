@@ -1361,7 +1361,7 @@ exports.facebookLiveSearch = (req, res) => {
     var os = new os_func();
 
     // os.execCommand('ls').then(resp=> {
-        os.execCommand('/usr/bin/python3 '+scriptPath+' '+keyword).then(resx=> {
+        os.execCommand('/usr/bin/python3 '+scriptPath+' "'+keyword+'"').then(resx=> {
             MongoClient.connect(uri, function (err, db) {
                 if (err) {
                     console.log('got here')
