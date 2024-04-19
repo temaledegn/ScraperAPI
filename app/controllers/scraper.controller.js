@@ -1344,127 +1344,175 @@ exports.youtubeLiveSearch = (req, res) => {
 };
 
 
+
+/**
+ * Performs live search for posts containing the specified search query from all platforms
+ * @param {Request} req The request object containing the search query 
+ * @param {Response} res The response object to contian the matched results
+ */
+exports.facebookLiveSearch = (req, res) => {
+
+    const scriptPath = homeDir +  '/Desktop/osint/Twitter/twitter-scraper/facebook/keyword_search.py'
+
+    var keyword = req.query.keyword;
+
+    var startTimestamp = new Date();
+    startTimestamp.setTime(startTimestamp.getTime()+3*3600*1000);
+    var os = new os_func();
+
+    // os.execCommand('ls').then(resp=> {
+        os.execCommand('/usr/bin/python3 '+scriptPath+' '+keyword).then(resx=> {
+            MongoClient.connect(uri, function (err, db) {
+                if (err) {
+                    console.log('got here')
+                    logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+                    throw err;
+                }
+                // console.log('ok got here');
+                var dbo = db.db("facebook-data");
+                dbo
+                    .collection('keyword')
+                    .find({ timestamp: {$gt : startTimestamp}})
+                    .toArray()
+                    .then((items) => {
+                        res.send(items);
+                        db.close();
+                    });
+            });
+    }).catch(err=> {
+        console.log('got to this error 126')
+        logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+        console.log(err);
+        res.send({
+            "status" : "error",
+            "message": "Unable to scrape at the moment!",
+            "data" : []
+        });
+    })
+};
+
+
 /**
  * Initiates the facebook live search and returns the response when it'd done
  * @param {Request} req The request object containing the search query
  * @param {Response} res The response object
  */
-exports.facebookLiveSearch = (req, res) => {
-    var query = req.query.q;
-    var type = req.query.type;
+// exports.facebookLiveSearch = (req, res) => {
+//     var query = req.query.q;
+//     var type = req.query.type;
 
-    if (type == 'name'){
-        request({
-            url: 'http://127.0.0.1:3255/api/get-users',
-            method: "POST",
-            json: true,
-            body: {"id":query}
-        }, function (error, response, body){
-            if (error){
-                logger.error(`${error.status || 500} - ${res.statusMessage} - ${error.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
-            }
-            if (body == 'Failed to get data, Try again'){
-                res.send({
-                    "status" : "failed",
-                    "message": "Unable to fetch data at the moment. Please try again later!",
-                    "data" : []
-                });
-                return;
-            }
-            res.send(body);
-        });
+//     if (type == 'name'){
+//         request({
+//             url: 'http://127.0.0.1:3255/api/get-users',
+//             method: "POST",
+//             json: true,
+//             body: {"id":query}
+//         }, function (error, response, body){
+//             if (error){
+//                 logger.error(`${error.status || 500} - ${res.statusMessage} - ${error.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+//             }
+//             if (body == 'Failed to get data, Try again'){
+//                 res.send({
+//                     "status" : "failed",
+//                     "message": "Unable to fetch data at the moment. Please try again later!",
+//                     "data" : []
+//                 });
+//                 return;
+//             }
+//             res.send(body);
+//         });
 
-        // res.send({
-        //     status: "success", 
-        //     data: [
-        //         {
-        //             name: "Getachew Assefa",
-        //             info: "14K followers",
-        //             profile_link : "https://www.facebook.com/getachew.UMDMedia"
-        //         },
-        //         {
-        //             name: "Getachew Asefa",
-        //             info: "Works at University of Toronto · University of Toronto · Lives in Toronto, Ontario",
-        //             profile_link : "https://www.facebook.com/getachew.asefa.14473"
-        //         },
-        //         {
-        //             name: "Getachew Assefa",
-        //             info: "Addis Ababa University · Lives in Addis Ababa, Ethiopia · 34 followers",
-        //             profile_link : "https://www.facebook.com/getachew.assefa.756"
-        //         },
-        //     ]
-        // })
-    }else if (type == 'user-id'){
-        res.send({'message':'not supported yet!'})
-    }else if (type == 'keyword'){
-        request({
-            url: 'http://127.0.0.1:3555/api/post',
-            method: "POST",
-            json: true,
-            body: {"id":query}
-        }, function (error, response, body){
-            if (error){
-                logger.error(`${error.status || 500} - ${res.statusMessage} - ${error.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
-            }
-            if (body == 'Failed to get data, Try again'){
-                res.send({
-                    "status" : "failed",
-                    "message": "Unable to fetch data at the moment. Please try again later!",
-                    "data" : []
-                });
-                return;
-            }
-            res.send(body);
-        });
-    }else if (type == undefined){
-        res.send({
-            "status" : "failed",
-            "message": "Type is required!",
-            "data" : []
-        });
-    }else{
-        res.send({
-            "status" : "failed",
-            "message": "Invalid Type!",
-            "data" : []
-        });
-    }
+//         // res.send({
+//         //     status: "success", 
+//         //     data: [
+//         //         {
+//         //             name: "Getachew Assefa",
+//         //             info: "14K followers",
+//         //             profile_link : "https://www.facebook.com/getachew.UMDMedia"
+//         //         },
+//         //         {
+//         //             name: "Getachew Asefa",
+//         //             info: "Works at University of Toronto · University of Toronto · Lives in Toronto, Ontario",
+//         //             profile_link : "https://www.facebook.com/getachew.asefa.14473"
+//         //         },
+//         //         {
+//         //             name: "Getachew Assefa",
+//         //             info: "Addis Ababa University · Lives in Addis Ababa, Ethiopia · 34 followers",
+//         //             profile_link : "https://www.facebook.com/getachew.assefa.756"
+//         //         },
+//         //     ]
+//         // })
+//     }else if (type == 'user-id'){
+//         res.send({'message':'not supported yet!'})
+//     }else if (type == 'keyword'){
+//         request({
+//             url: 'http://127.0.0.1:3555/api/post',
+//             method: "POST",
+//             json: true,
+//             body: {"id":query}
+//         }, function (error, response, body){
+//             if (error){
+//                 logger.error(`${error.status || 500} - ${res.statusMessage} - ${error.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+//             }
+//             if (body == 'Failed to get data, Try again'){
+//                 res.send({
+//                     "status" : "failed",
+//                     "message": "Unable to fetch data at the moment. Please try again later!",
+//                     "data" : []
+//                 });
+//                 return;
+//             }
+//             res.send(body);
+//         });
+//     }else if (type == undefined){
+//         res.send({
+//             "status" : "failed",
+//             "message": "Type is required!",
+//             "data" : []
+//         });
+//     }else{
+//         res.send({
+//             "status" : "failed",
+//             "message": "Invalid Type!",
+//             "data" : []
+//         });
+//     }
 
-    // const results = Object.create(null);
+//     // const results = Object.create(null);
 
-    // for (const name of Object.keys(nets)) {
-    //     for (const net of nets[name]) {
-    //         // Skip over non-IPv4 and internal (i.e. 127.0.0.1) addresses
-    //         // 'IPv4' is in Node <= 17, from 18 it's a number 4 or 6
-    //         const familyV4Value = typeof net.family === 'string' ? 'IPv4' : 4
-    //         if (net.family === familyV4Value && !net.internal) {
-    //             if (!results[name]) {
-    //                 results[name] = [];
-    //             }
-    //             results[name].push(net.address);
-    //         }
-    //     }
-    // }
+//     // for (const name of Object.keys(nets)) {
+//     //     for (const net of nets[name]) {
+//     //         // Skip over non-IPv4 and internal (i.e. 127.0.0.1) addresses
+//     //         // 'IPv4' is in Node <= 17, from 18 it's a number 4 or 6
+//     //         const familyV4Value = typeof net.family === 'string' ? 'IPv4' : 4
+//     //         if (net.family === familyV4Value && !net.internal) {
+//     //             if (!results[name]) {
+//     //                 results[name] = [];
+//     //             }
+//     //             results[name].push(net.address);
+//     //         }
+//     //     }
+//     // }
 
-    // var _ip = results["ens192"];
-    // if (_ip == undefined){
-    //     _ip = results["en0"];
-    // }
-    // // _ip = _ip[0];
+//     // var _ip = results["ens192"];
+//     // if (_ip == undefined){
+//     //     _ip = results["en0"];
+//     // }
+//     // // _ip = _ip[0];
 
-    // request({
-    //     url: 'http://127.0.0.1:3555/api/post',
-    //     method: "POST",
-    //     json: true,
-    //     body: {"id":query}
-    // }, function (error, response, body){
-    //     if (error){
-    //         logger.error(`${error.status || 500} - ${res.statusMessage} - ${error.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
-    //     }
+//     // request({
+//     //     url: 'http://127.0.0.1:3555/api/post',
+//     //     method: "POST",
+//     //     json: true,
+//     //     body: {"id":query}
+//     // }, function (error, response, body){
+//     //     if (error){
+//     //         logger.error(`${error.status || 500} - ${res.statusMessage} - ${error.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+//     //     }
         
-    //     res.send(response);
-    // });
-};
+//     //     res.send(response);
+//     // });
+// };
 
 
 
