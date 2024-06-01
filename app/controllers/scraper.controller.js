@@ -1,7 +1,7 @@
-const MongoClient = require("mongodb");
+// const MongoClient = require("mongodb");
 const { exec } = require('child_process');
 const homeDir = require('os').homedir();
-
+const { MongoClient } = require('mongodb');
 
 const { spawnSync } = require( 'child_process' );
 
@@ -24,8 +24,7 @@ const logConfiguration = {
 
 const logger = winston.createLogger(logConfiguration);
 
-const uri =
-    "mongodb://127.0.0.1:27017/?readPreference=primary&appname=MongoDB%20Compass&ssl=false";
+const uri = "mongodb://localhost:27017/"
 
 // Action Request
 

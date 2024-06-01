@@ -2,7 +2,8 @@ const homeDir = require('os').homedir();
 const fs = require('fs');
 const { type } = require('os');
 const { exec } = require('child_process');
-
+const jwt = require('jsonwebtoken');
+const secretKey = 'scraper-secret-key';
 
 const winston =  require('winston');
 
@@ -20,7 +21,7 @@ const logger = winston.createLogger(logConfiguration);
 const telegramPath = homeDir + '/Desktop/osint/Telegram/Telegram/data.json'
 // const fbPagePath = homeDir + '/Desktop/osint/Facebook/facebook-posts/target.txt'
 const fbPagePath = homeDir + '/Desktop/osint/Twitter/twitter-scraper/facebook/list_post.txt'
-const fbUserPath = homeDir + '/Desktop/osint/Facebook/posts-users/target.txt'
+const fbUserPath = homeDir + '/Desktop/osint/Twitter/twitter-scraper/facebook/list_user.txt'
 const twitterPath = homeDir + '/Desktop/osint/Twitter/twitter-scraper/Authentication/Document.txt'
 const linkedinPath = homeDir + '/Desktop/osint/LinkedIn/datarequ.txt'
 const youtubePath = homeDir + '/Desktop/osint/Twitter/twitter-scraper/YouTube/url.txt'
@@ -41,16 +42,30 @@ const twitterCurrentlyScrapingKeywordPath = homeDir + '/Desktop/osint/Twitter/tw
  * @param {Response} res The response object
  */
 exports.fbUserGet = (req, res) => {
-    let _type = req.query.type;
-    fs.readFile(fbUserPath, 'utf8', (err, data) => {
-        if (err) { 
-  logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
-            res.send([])
-        } else {
-            res.send(data.split('\n'));
+    const authHeader = req.headers['x-access-token'];
+    const token = authHeader;
+    jwt.verify(token, secretKey, (err, user) => {
+        console.log(err)
+        if (err) {
+            return res.sendStatus(403);
         }
+        req.user = user;
+
+        let _type = req.query.type;
+        fs.readFile(fbUserPath, 'utf8', (err, data) => {
+            if (err) { 
+                logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+                res.send([])
+            } else {
+                res.send(data.split('\n').filter((item) => item.includes(user.id)).map((item) => item.split(' ')[0]));
+            }
+
+        });
 
     });
+
+
+   
 }
 
 /**
@@ -59,30 +74,46 @@ exports.fbUserGet = (req, res) => {
  * @param {Response} res The response object
  */
 exports.fbUserAdd = (req, res) => {
-    let _type = req.body.type;
-    let entry =  _type == 'link' ? req.body.link:req.body.keyword;
-    
-    fs.readFile(fbUserPath, 'utf8', (err, data) => {
-        if (err) { 
-            logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
-            res.send({ 'type': 'error', 'message': 'cant read' })
-        } else {
-            let links = data.split('\n');
-            if (links.includes(entry)) {
-                res.send({ 'type': 'warning', 'message': 'already added' })
-            } else {
-                fs.appendFile(fbUserPath, '\n' + entry, function (err) {
-                   if (err) { 
-                        logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
-                        res.send({ 'type': 'error', 'message': 'cant append' })
-                    } else {
-                        res.send({ 'type': 'success', 'message': 'appended' })
-                    }
-                });
-            }
+
+    const authHeader = req.headers['x-access-token'];
+    const token = authHeader;
+    jwt.verify(token, secretKey, (err, user) => {
+        console.log(err)
+        if (err) {
+            return res.sendStatus(403);
         }
+        req.user = user;
+
+
+        let _type = req.body.type;
+        let entry = _type == 'link' ? (req.body.link + ' ' + user.id) :(req.body.keyword + ' ' + user.id);
+        fs.readFile(fbUserPath, 'utf8', (err, data) => {
+            if (err) { 
+    logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+                res.send({ 'type': 'error', 'message': 'cant read' })
+            } else {
+
+                let usernames = data.split('\n');
+                if (usernames.includes(entry)) {
+                    res.send({ 'type': 'warning', 'message': 'already added' })
+                } else {
+                    fs.appendFile(fbUserPath, '\n' + entry, function (err) {
+                        if (err) { 
+    logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+                            res.send({ 'type': 'error', 'message': 'cant append' })
+                        } else {
+                            res.send({ 'type': 'success', 'message': _type+' added' })
+                        }
+                    });
+                }
+            }
+        });
 
     });
+
+
+
+    
 }
 
 /**
@@ -91,35 +122,49 @@ exports.fbUserAdd = (req, res) => {
  * @param {Response} res The response object
  */
 exports.fbUserDelete = (req, res) => {
-    let _type = req.body.type;
-    let entry =  _type == 'link' ? req.body.link:req.body.keyword;
 
-    fs.readFile(fbUserPath, 'utf8', (err, data) => {
-        if (err) { 
-  logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
-            res.send({ 'type': 'error', 'message': 'cant read' })
-        } else {
-            let links = data.split('\n');
-            if (links.includes(entry)) {
-                const index = links.indexOf(entry);
-                if (index > -1) {
-                    links.splice(index, 1);
-                }
-                fs.writeFile(fbUserPath, links.join('\n'), function (err) {
-                    if (err) { 
-  logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
-                        res.send({ 'type': 'error', 'message': 'cant delete' });
-                    } else {
-                        res.send({ 'type': 'success', 'message': 'link removed' });
-                    }
-
-                });
-            } else {
-                res.send({ 'type': 'warning', 'message': 'link not found' });
-            }
+    const authHeader = req.headers['x-access-token'];
+    const token = authHeader;
+    jwt.verify(token, secretKey, (err, user) => {
+        console.log(err)
+        if (err) {
+            return res.sendStatus(403);
         }
+        req.user = user;
+
+        let _type = req.body.type;
+        let entry = _type == 'link' ? (req.body.link + ' '+ user.id):(req.body.keyword + ' ' + user.id);
+        fs.readFile(fbUserPath, 'utf8', (err, data) => {
+            if (err) { 
+    logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+                res.send({ 'type': 'error', 'message': 'cant read' })
+            } else {
+                let usernames = data.split('\n');
+                if (usernames.includes(entry)) {
+                    const index = usernames.indexOf(entry);
+                    if (index > -1) {
+                        usernames.splice(index, 1);
+                    }
+                    fs.writeFile(fbUserPath, usernames.join('\n'), function (err) {
+                        if (err) { 
+    logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+                            res.send({ 'type': 'error', 'message': 'cant delete' });
+                        } else {
+                            res.send({ 'type': 'success', 'message': 'username removed' });
+                        }
+
+                    });
+                } else {
+                    res.send({ 'type': 'error', 'message': 'username not found' });
+                }
+            }
+
+        });
 
     });
+
+
+    
 }
 
 /**
@@ -128,16 +173,30 @@ exports.fbUserDelete = (req, res) => {
  * @param {Response} res The response object
  */
 exports.fbPageGet = (req, res) => {
-    let _type = req.query.type;
-    fs.readFile(fbPagePath, 'utf8', (err, data) => {
-        if (err) { 
-  logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
-            res.send([])
-        } else {
-
-            res.send(data.split('\n'));
+    const authHeader = req.headers['x-access-token'];
+    const token = authHeader;
+    jwt.verify(token, secretKey, (err, user) => {
+        console.log(err)
+        if (err) {
+            return res.sendStatus(403);
         }
+        req.user = user;
+
+        let _type = req.query.type;
+        fs.readFile(fbPagePath, 'utf8', (err, data) => {
+            if (err) { 
+                logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+                res.send([])
+            } else {
+                res.send(data.split('\n').filter((item) => item.includes(user.id)).map((item) => item.split(' ')[0]));
+            }
+
+        });
+
     });
+
+
+   
 }
 
 /**
@@ -146,29 +205,46 @@ exports.fbPageGet = (req, res) => {
  * @param {Response} res The response object
  */
 exports.fbPageAdd = (req, res) => {
-    let _type = req.body.type;
-    let entry = _type == 'link' ? req.body.link : req.body.keyword;
-    fs.readFile(fbPagePath, 'utf8', (err, data) => {
-        if (err) { 
-  logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
-            res.send({ 'type': 'error', 'message': 'cant read' })
-        } else {
-            let links = data.split('\n');
-            if (links.includes(entry)) {
-                res.send({ 'type': 'warning', 'message': 'already added' })
-            } else {
-                fs.appendFile(fbPagePath, '\n' + entry, function (err) {
-                    if (err) { 
-  logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
-                        res.send({ 'type': 'error', 'message': 'cant append' })
-                    } else {
-                        res.send({ 'type': 'success', 'message': _type+' Added' })
-                    }
-                });
-            }
+
+    const authHeader = req.headers['x-access-token'];
+    const token = authHeader;
+    jwt.verify(token, secretKey, (err, user) => {
+        console.log(err)
+        if (err) {
+            return res.sendStatus(403);
         }
+        req.user = user;
+
+
+        let _type = req.body.type;
+        let entry = _type == 'link' ? (req.body.link + ' ' + user.id) :(req.body.keyword + ' ' + user.id);
+        fs.readFile(fbPagePath, 'utf8', (err, data) => {
+            if (err) { 
+    logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+                res.send({ 'type': 'error', 'message': 'cant read' })
+            } else {
+
+                let usernames = data.split('\n');
+                if (usernames.includes(entry)) {
+                    res.send({ 'type': 'warning', 'message': 'already added' })
+                } else {
+                    fs.appendFile(fbPagePath, '\n' + entry, function (err) {
+                        if (err) { 
+    logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+                            res.send({ 'type': 'error', 'message': 'cant append' })
+                        } else {
+                            res.send({ 'type': 'success', 'message': _type+' added' })
+                        }
+                    });
+                }
+            }
+        });
 
     });
+
+
+
+    
 }
 /**
  * Deletes existing page/group link from to the scraping queue
@@ -176,35 +252,49 @@ exports.fbPageAdd = (req, res) => {
  * @param {Response} res The response object
  */
 exports.fbPageDelete = (req, res) => {
-    let _type = req.body.type;
-    let entry = _type == 'link' ? req.body.link : req.body.keyword;
-    
-    fs.readFile(fbPagePath, 'utf8', (err, data) => {
-        if (err) { 
-  logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
-            res.send({ 'type': 'error', 'message': 'cant read' })
-        } else {
-            let links = data.split('\n');
-            if (links.includes(entry)) {
-                const index = links.indexOf(entry);
-                if (index > -1) {
-                    links.splice(index, 1);
-                }
-                fs.writeFile(fbPagePath, links.join('\n'), function (err) {
-                    if (err) { 
-  logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
-                        res.send({ 'type': 'error', 'message': 'cant delete' });
-                    } else {
-                        res.send({ 'type': 'success', 'message': _type+' removed' });
-                    }
 
-                });
-            } else {
-                res.send({ 'type': 'warning', 'message': _type+' not found' });
-            }
+    const authHeader = req.headers['x-access-token'];
+    const token = authHeader;
+    jwt.verify(token, secretKey, (err, user) => {
+        console.log(err)
+        if (err) {
+            return res.sendStatus(403);
         }
+        req.user = user;
+
+        let _type = req.body.type;
+        let entry = _type == 'link' ? (req.body.link + ' '+ user.id):(req.body.keyword + ' ' + user.id);
+        fs.readFile(fbPagePath, 'utf8', (err, data) => {
+            if (err) { 
+    logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+                res.send({ 'type': 'error', 'message': 'cant read' })
+            } else {
+                let usernames = data.split('\n');
+                if (usernames.includes(entry)) {
+                    const index = usernames.indexOf(entry);
+                    if (index > -1) {
+                        usernames.splice(index, 1);
+                    }
+                    fs.writeFile(fbPagePath, usernames.join('\n'), function (err) {
+                        if (err) { 
+    logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+                            res.send({ 'type': 'error', 'message': 'cant delete' });
+                        } else {
+                            res.send({ 'type': 'success', 'message': 'username removed' });
+                        }
+
+                    });
+                } else {
+                    res.send({ 'type': 'error', 'message': 'username not found' });
+                }
+            }
+
+        });
 
     });
+
+
+    
 }
 
 //************** END FACEBOOK  ****************/
@@ -218,16 +308,30 @@ exports.fbPageDelete = (req, res) => {
  * @param {Response} res The response object
  */
 exports.twitterGet = (req, res) => {
-    let _type = req.query.type;
-    fs.readFile(twitterPath, 'utf8', (err, data) => {
-        if (err) { 
-  logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
-            res.send([])
-        } else {
-            res.send(data.split('\n'));
+    const authHeader = req.headers['x-access-token'];
+    const token = authHeader;
+    jwt.verify(token, secretKey, (err, user) => {
+        console.log(err)
+        if (err) {
+            return res.sendStatus(403);
         }
+        req.user = user;
+
+        let _type = req.query.type;
+        fs.readFile(twitterPath, 'utf8', (err, data) => {
+            if (err) { 
+                logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+                res.send([])
+            } else {
+                res.send(data.split('\n').filter((item) => item.includes(user.id)).map((item) => item.split(' ')[0]));
+            }
+
+        });
 
     });
+
+
+   
 }
 /**
  * Adds new twitter username to the scraping queue
@@ -235,29 +339,46 @@ exports.twitterGet = (req, res) => {
  * @param {Response} res The response object
  */
 exports.twitterAdd = (req, res) => {
-    let _type = req.body.type;
-    let entry = _type == 'username' ? req.body.username:req.body.keyword;
-    fs.readFile(twitterPath, 'utf8', (err, data) => {
-        if (err) { 
-  logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
-            res.send({ 'type': 'error', 'message': 'cant read' })
-        } else {
 
-            let usernames = data.split('\n');
-            if (usernames.includes(entry)) {
-                res.send({ 'type': 'warning', 'message': 'already added' })
-            } else {
-                fs.appendFile(twitterPath, '\n' + entry, function (err) {
-                    if (err) { 
-  logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
-                        res.send({ 'type': 'error', 'message': 'cant append' })
-                    } else {
-                        res.send({ 'type': 'success', 'message': _type+' added' })
-                    }
-                });
-            }
+    const authHeader = req.headers['x-access-token'];
+    const token = authHeader;
+    jwt.verify(token, secretKey, (err, user) => {
+        console.log(err)
+        if (err) {
+            return res.sendStatus(403);
         }
+        req.user = user;
+
+
+        let _type = req.body.type;
+        let entry = _type == 'username' ? (req.body.username + ' ' + user.id) :(req.body.keyword + ' ' + user.id);
+        fs.readFile(twitterPath, 'utf8', (err, data) => {
+            if (err) { 
+    logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+                res.send({ 'type': 'error', 'message': 'cant read' })
+            } else {
+
+                let usernames = data.split('\n');
+                if (usernames.includes(entry)) {
+                    res.send({ 'type': 'warning', 'message': 'already added' })
+                } else {
+                    fs.appendFile(twitterPath, '\n' + entry, function (err) {
+                        if (err) { 
+    logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+                            res.send({ 'type': 'error', 'message': 'cant append' })
+                        } else {
+                            res.send({ 'type': 'success', 'message': _type+' added' })
+                        }
+                    });
+                }
+            }
+        });
+
     });
+
+
+
+    
 }
 
 /**
@@ -266,34 +387,49 @@ exports.twitterAdd = (req, res) => {
  * @param {Response} res The response object
  */
 exports.twitterDelete = (req, res) => {
-    let _type = req.body.type;
-    let entry = _type == 'username' ? req.body.username:req.body.keyword;
-    fs.readFile(twitterPath, 'utf8', (err, data) => {
-        if (err) { 
-  logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
-            res.send({ 'type': 'error', 'message': 'cant read' })
-        } else {
-            let usernames = data.split('\n');
-            if (usernames.includes(entry)) {
-                const index = usernames.indexOf(entry);
-                if (index > -1) {
-                    usernames.splice(index, 1);
-                }
-                fs.writeFile(twitterPath, usernames.join('\n'), function (err) {
-                    if (err) { 
-  logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
-                        res.send({ 'type': 'error', 'message': 'cant delete' });
-                    } else {
-                        res.send({ 'type': 'success', 'message': 'username removed' });
-                    }
 
-                });
-            } else {
-                res.send({ 'type': 'error', 'message': 'username not found' });
-            }
+    const authHeader = req.headers['x-access-token'];
+    const token = authHeader;
+    jwt.verify(token, secretKey, (err, user) => {
+        console.log(err)
+        if (err) {
+            return res.sendStatus(403);
         }
+        req.user = user;
+
+        let _type = req.body.type;
+        let entry = _type == 'username' ? (req.body.username + ' '+ user.id):(req.body.keyword + ' ' + user.id);
+        fs.readFile(twitterPath, 'utf8', (err, data) => {
+            if (err) { 
+    logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+                res.send({ 'type': 'error', 'message': 'cant read' })
+            } else {
+                let usernames = data.split('\n');
+                if (usernames.includes(entry)) {
+                    const index = usernames.indexOf(entry);
+                    if (index > -1) {
+                        usernames.splice(index, 1);
+                    }
+                    fs.writeFile(twitterPath, usernames.join('\n'), function (err) {
+                        if (err) { 
+    logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+                            res.send({ 'type': 'error', 'message': 'cant delete' });
+                        } else {
+                            res.send({ 'type': 'success', 'message': 'username removed' });
+                        }
+
+                    });
+                } else {
+                    res.send({ 'type': 'error', 'message': 'username not found' });
+                }
+            }
+
+        });
 
     });
+
+
+    
 }
 
 //*************** END TWITTER  ******************/
@@ -322,30 +458,44 @@ exports.tgGet = (req, res) => {
  * @param {Response} res The response object
  */
 exports.tgChannelAdd = (req, res) => {
-    let username = req.body.username;
-    fs.readFile(telegramPath, 'utf8', (err, data) => {
-        if (err) { 
-  logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
-            res.send({ 'type': 'error', 'message': 'cant read' })
-        } else {
-            let usernames = JSON.parse(data);
-            if (usernames.channel_username.includes(username)) {
-                res.send({ 'type': 'warning', 'message': 'already added' });
-            } else {
-                usernames.channel_username.push(username);
-                fs.writeFile(telegramPath, JSON.stringify(usernames), function (err) {
-                    if (err) { 
-  logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
-                        res.send({ 'type': 'error', 'message': 'cant add' });
-                    } else {
-                        res.send({ 'type': 'success', 'message': 'username added' });
-                    }
-
-                });
-            }
+    const authHeader = req.headers['x-access-token'];
+    const token = authHeader;
+    jwt.verify(token, secretKey, (err, user) => {
+        console.log(err)
+        if (err) {
+            return res.sendStatus(403);
         }
+        req.user = user;
+
+        let username = {'requested_by': user.id, 'username': req.body.username};
+        fs.readFile(telegramPath, 'utf8', (err, data) => {
+            if (err) { 
+        logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+                    res.send({ 'type': 'error', 'message': 'cant read' })
+                } else {
+                    let usernames = JSON.parse(data);
+                    if (usernames.channel_username.includes(username)) {
+                        res.send({ 'type': 'warning', 'message': 'already added' });
+                    } else {
+                        usernames.channel_username.push(username);
+                        fs.writeFile(telegramPath, JSON.stringify(usernames), function (err) {
+                            if (err) { 
+        logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+                                res.send({ 'type': 'error', 'message': 'cant add' });
+                            } else {
+                                res.send({ 'type': 'success', 'message': 'username added' });
+                            }
+        
+                        });
+                    }
+                }
+        
+            });
 
     });
+
+
+    
 }
 
 /**
@@ -354,34 +504,53 @@ exports.tgChannelAdd = (req, res) => {
  * @param {Response} res The response object
  */
 exports.tgChannelDelete = (req, res) => {
-    let username = req.body.username;
 
-    fs.readFile(telegramPath, 'utf8', (err, data) => {
-        if (err) { 
-  logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
-            res.send({ 'type': 'error', 'message': 'cant read' })
-        } else {
-            let usernames = JSON.parse(data);
-            if (usernames.channel_username.includes(username)) {
-                const index = usernames.channel_username.indexOf(username);
-                if (index > -1) {
-                    usernames.channel_username.splice(index, 1);
-                }
-                fs.writeFile(telegramPath, JSON.stringify(usernames), function (err) {
-                    if (err) { 
-  logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
-                        res.send({ 'type': 'error', 'message': 'cant delete' });
-                    } else {
-                        res.send({ 'type': 'success', 'message': 'username removed' });
-                    }
-
-                });
-            } else {
-                res.send({ 'type': 'error', 'message': 'username not found' });
-            }
+    const authHeader = req.headers['x-access-token'];
+    const token = authHeader;
+    jwt.verify(token, secretKey, (err, user) => {
+        console.log(err)
+        if (err) {
+            return res.sendStatus(403);
         }
+        req.user = user;
+
+        
+        let username = {'requested_by': user.id, 'username':req.body.username};
+
+        fs.readFile(telegramPath, 'utf8', (err, data) => {
+            if (err) { 
+    logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+                res.send({ 'type': 'error', 'message': 'cant read' })
+            } else {
+                let usernames = JSON.parse(data);
+                console.log(username)
+                    console.log(usernames)
+                    
+                if (usernames.channel_username.includes(username)) {
+                    
+                    const index = usernames.channel_username.indexOf(username);
+                    if (index > -1) {
+                        usernames.channel_username.splice(index, 1);
+                    }
+                    fs.writeFile(telegramPath, JSON.stringify(usernames), function (err) {
+                        if (err) { 
+    logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+                            res.send({ 'type': 'error', 'message': 'cant delete' });
+                        } else {
+                            res.send({ 'type': 'success', 'message': 'username removed' });
+                        }
+
+                    });
+                } else {
+                    res.send({ 'type': 'error', 'message': 'username not found' });
+                }
+            }
+
+        });
 
     });
+
+    
 }
 
 /**
@@ -390,29 +559,45 @@ exports.tgChannelDelete = (req, res) => {
  * @param {Response} res The response object
  */
 exports.tgGroupAdd = (req, res) => {
-    let username = req.body.username;
-    fs.readFile(telegramPath, 'utf8', (err, data) => {
-        if (err) { 
-  logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
-            res.send({ 'type': 'error', 'message': 'cant read' })
-        } else {
-            let usernames = JSON.parse(data);
-            if (usernames.group_username.includes(username)) {
-                res.send({ 'type': 'warning', 'message': 'already added' });
-            } else {
-                usernames.group_username.push(username);
-                fs.writeFile(telegramPath, JSON.stringify(usernames), function (err) {
-                    if (err) { 
-  logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
-                        res.send({ 'type': 'error', 'message': 'cant add' });
-                    }
-                    res.send({ 'type': 'success', 'message': 'username added' });
-                });
-            }
 
+    const authHeader = req.headers['x-access-token'];
+    const token = authHeader;
+    jwt.verify(token, secretKey, (err, user) => {
+        console.log(err)
+        if (err) {
+            return res.sendStatus(403);
         }
+        req.user = user;
+        let username = {'requested_by': user.id, 'username': req.body.username};
+        fs.readFile(telegramPath, 'utf8', (err, data) => {
+            if (err) { 
+      logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+                res.send({ 'type': 'error', 'message': 'cant read' })
+            } else {
+                let usernames = JSON.parse(data);
+                if (usernames.group_username.includes(username)) {
+                    res.send({ 'type': 'warning', 'message': 'already added' });
+                } else {
+                    usernames.group_username.push(username);
+                    fs.writeFile(telegramPath, JSON.stringify(usernames), function (err) {
+                        if (err) { 
+      logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+                            res.send({ 'type': 'error', 'message': 'cant add' });
+                        }
+                        res.send({ 'type': 'success', 'message': 'username added' });
+                    });
+                }
+    
+            }
+    
+        });
+        
 
     });
+
+
+
+    
 }
 
 /**
