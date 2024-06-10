@@ -110,7 +110,7 @@ exports.fbUserUsers = (req, res) => {
        dbo
            .collection("userscollections")
            .findOne(
-               { _id: MongoClient.ObjectId(req.params.date_doc_id) },
+               { _id: ObjectId(req.params.date_doc_id) },
                { projection: { 'users.posts': 0 } },
                function (err, result) {
                     if (err) {
@@ -140,7 +140,7 @@ exports.fbUserPosts = (req, res) => {
        dbo
            .collection("userscollections")
            .findOne(
-               { _id: MongoClient.ObjectId(req.params.date_doc_id), 'users._id':MongoClient.ObjectId(req.params.user_doc_id) },
+               { _id: ObjectId(req.params.date_doc_id), 'users._id':ObjectId(req.params.user_doc_id) },
                { projection: {'users.posts.$':1, }},
                function (err, result) {
                     if (err) {
@@ -234,7 +234,7 @@ exports.fbPagePages = (req, res) => {
        dbo
            .collection("groupscollections")
            .findOne(
-               { _id: MongoClient.ObjectId(req.params.date_doc_id) },
+               { _id: ObjectId(req.params.date_doc_id) },
                { projection: { 'groups.posts': 0 } },
                function (err, result) {
                     if (err) {
@@ -265,7 +265,7 @@ exports.fbPagePosts = (req, res) => {
        dbo
            .collection("groupscollections")
            .findOne(
-               { _id: MongoClient.ObjectId(req.params.date_doc_id), 'groups._id':MongoClient.ObjectId(req.params.page_doc_id) },
+               { _id: ObjectId(req.params.date_doc_id), 'groups._id':ObjectId(req.params.page_doc_id) },
                { projection: {'groups.posts.$':1, }},
                function (err, result) {
                     if (err) {
@@ -851,7 +851,7 @@ exports.telegramPosts = (req, res) => {
             dbo
                 .collection("groups")
                 .findOne(
-                    { _id: MongoClient.ObjectId(req.params.doc_id) },
+                    { _id: ObjectId(req.params.doc_id) },
                     function (err, result) {
                          if (err) {
                             logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
@@ -875,7 +875,7 @@ exports.telegramPosts = (req, res) => {
             dbo
                 .collection("channels")
                 .findOne(
-                    { _id: MongoClient.ObjectId(req.params.doc_id),  },
+                    { _id: ObjectId(req.params.doc_id),  },
                     function (err, result) {
                         if (err) {
                             logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
@@ -1176,7 +1176,7 @@ exports.youtubeComments = (req, res) => {
         dbo
             .collection("youtube")
             .findOne(
-                { _id: MongoClient.ObjectId(req.params.doc_id) },
+                { _id: ObjectId(req.params.doc_id) },
                 { projection: { "Comments": 1 , 'comments': 1} },
                 function (err, result) {
                      if (err) {
