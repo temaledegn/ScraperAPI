@@ -760,21 +760,39 @@ exports.twitterConfig = (req, res) => {
  * @param {Response} res The response object, containing scraped telegram channel names and their scraping date
  */
 exports.telegramChannelAllScraped = (req, res) => {
-    MongoClient.connect(uri, function (err, db) {
+
+
+    const authHeader = req.headers['x-access-token'];
+    const token = authHeader;
+    jwt.verify(token, secretKey, (err, user) => {
+        console.log(err)
         if (err) {
-            logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
-            throw err;
+            return res.sendStatus(403);
         }
-        var dbo = db.db("telegram-data");
-        dbo
-            .collection("channels")
-            .find({}, { projection: { data: 0 } })
-            .toArray()
-            .then((items) => {
-                res.send(items);
-                db.close();
-            });
+        req.user = user;
+        
+        
+        MongoClient.connect(uri, function (err, db) {
+            if (err) {
+                logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+                throw err;
+            }
+            var dbo = db.db("telegram-data");
+            dbo
+                .collection("channels")
+                .find({"osint_user_id":user.id}, { projection: { data: 0 } })
+                .toArray()
+                .then((items) => {
+                    res.send(items);
+                    db.close();
+                });
+        });
+
+
     });
+
+
+    
 };
 
 /**
@@ -783,21 +801,38 @@ exports.telegramChannelAllScraped = (req, res) => {
  * @param {Response} res The response object, containing scraped telegram group names and their scraping date
  */
 exports.telegramGroupAllScraped = (req, res) => {
+
+
+    const authHeader = req.headers['x-access-token'];
+    const token = authHeader;
+    jwt.verify(token, secretKey, (err, user) => {
+        console.log(err)
+        if (err) {
+            return res.sendStatus(403);
+        }
+        req.user = user;
+        
+        
+        
     MongoClient.connect(uri, function (err, db) {
-         if (err) {
-                logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
-                throw err;
-            }
-        var dbo = db.db("telegram-data");
-        dbo
-            .collection("groups")
-            .find({}, { projection: { group_data: 0 } })
-            .toArray()
-            .then((items) => {
-                res.send(items);
-                db.close();
-            });
+        if (err) {
+               logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+               throw err;
+           }
+       var dbo = db.db("telegram-data");
+       dbo
+           .collection("groups")
+           .find({"osint_user_id":user.id}, { projection: { group_data: 0 } })
+           .toArray()
+           .then((items) => {
+               res.send(items);
+               db.close();
+           });
+   });
+
     });
+
+    
 };
 
 /**
