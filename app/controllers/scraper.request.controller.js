@@ -526,9 +526,9 @@ exports.tgChannelDelete = (req, res) => {
                 console.log(username)
                     console.log(usernames)
                     
-                if (usernames.channel_username.includes(username)) {
+                if (usernames.channel_username.map(item => item.username).includes(username)) {
                     
-                    const index = usernames.channel_username.indexOf(username);
+                    const index = usernames.channel_username.map(item => item.username).indexOf(username);
                     if (index > -1) {
                         usernames.channel_username.splice(index, 1);
                     }
@@ -614,8 +614,8 @@ exports.tgGroupDelete = (req, res) => {
             res.send({ 'type': 'error', 'message': 'cant read' })
         } else {
             let usernames = JSON.parse(data);
-            if (usernames.group_username.includes(username)) {
-                const index = usernames.group_username.indexOf(username);
+            if (usernames.group_username.map(item => item.username).includes(username)) {
+                const index = usernames.group_username.map(item => item.username).indexOf(username);
                 if (index > -1) {
                     usernames.group_username.splice(index, 1);
                 }
