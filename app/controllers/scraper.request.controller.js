@@ -515,7 +515,7 @@ exports.tgChannelDelete = (req, res) => {
         req.user = user;
 
         
-        let username = {'requested_by': user.id, 'username':req.body.username};
+        let username = req.body.username;
 
         fs.readFile(telegramPath, 'utf8', (err, data) => {
             if (err) { 
@@ -523,9 +523,7 @@ exports.tgChannelDelete = (req, res) => {
                 res.send({ 'type': 'error', 'message': 'cant read' })
             } else {
                 let usernames = JSON.parse(data);
-                console.log(username)
-                    console.log(usernames)
-                    
+                
                 if (usernames.channel_username.map(item => item.username).includes(username)) {
                     
                     const index = usernames.channel_username.map(item => item.username).indexOf(username);
