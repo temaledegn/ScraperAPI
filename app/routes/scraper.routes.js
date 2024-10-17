@@ -124,6 +124,13 @@ module.exports = function (app) {
   app.get("/common/insights/", [cors(), authJwt.verifyToken, authJwt.isAdmin], controller.getInsights);
 
 
+  app.get("/fb-collection/all/", [cors(), authJwt.verifyToken, authJwt.isAdmin], controller.customGetAllFbCollectin);
+  app.get("/fb-collection/search/", [cors(), authJwt.verifyToken, authJwt.isAdmin], controller.customSearchFbCollectin);
+
+  app.get("/fb-targets/get-all/", [cors(), authJwt.verifyToken, authJwt.isAdmin], controller.customGetTargets);
+  app.get("/fb-targets/add/", [cors(), authJwt.verifyToken, authJwt.isAdmin], controller.customAddTarget);
+  app.get("/fb-targets/delete/", [cors(), authJwt.verifyToken, authJwt.isAdmin], controller.customDeleteTarget);
+
 }
 
 

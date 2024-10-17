@@ -1868,3 +1868,146 @@ exports.getInsights = (req, res) => {
 /* ************************************* */
 /* ************  COMMON     ************ */
 /* ************************************* */
+
+
+
+
+/* ************************************* */
+/* ************  CUSTOM     ************ */
+/* ************************************* */
+
+exports.customGetAllFbCollection = (req, res) => {
+    MongoClient.connect(uri, async function (err, db) {
+        
+       if (err) {
+        logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+        throw err;
+    }
+        var dbo = db.db("facebook_users");
+        dbo
+            .collection("data")
+            .find({})
+            .toArray()
+            .then((items) => {
+                res.send(items);
+                db.close();
+            });
+                
+        });
+
+   
+};
+
+exports.customSearchFbCollection = (req, res) => {
+    MongoClient.connect(uri, async function (err, db) {
+        const sq = req.query.q;
+        let re = new RegExp(".*" + sq + ".*", "i");
+        MongoClient.connect(uri, function (err, db) {
+            if (err) {
+                logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+                throw err;
+            }
+            var dbo = db.db("facebook_users");
+            dbo
+                .collection("data")
+                .aggregate([
+                    {
+                        $project: {
+                            posts: {
+                                $filter: {
+                                    input: "$posts",
+                                    as: "posts",
+                                    cond: {
+                                        $regexMatch: {
+                                            input: "$$posts.post_text",
+                                            regex: re,
+                                        },
+                                    },
+                                },
+                            },
+                            // Fullname: 1,
+                            // UserName: 1,
+                        },
+                    },
+                ])
+                .toArray()
+                .then((items) => {
+
+                dbo
+                .collection("data")
+                .aggregate([
+                    {
+                        $project: {
+                            posts: {
+                                $filter: {
+                                    input: "$posts",
+                                    as: "posts",
+                                    cond: {
+                                        $regexMatch: {
+                                            input: "$$posts.post_text",
+                                            regex: re,
+                                        },
+                                    },
+                                },
+                            },
+                            // Fullname: 1,
+                            // UserName: 1,
+                        },
+                    },
+                ]).toArray()
+                .then((live_items) => {
+                    res.send(items.concat(live_items));
+                    db.close();
+                })
+
+                    
+                });
+        });
+
+   });
+};
+
+exports.customGetTargets = (req, res) => {
+    MongoClient.connect(uri, async function (err, db) {
+       
+        if (err) {
+            logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+            throw err;
+        }
+            var dbo = db.db("facebook_users");
+            dbo
+                .collection("targets")
+                .find({})
+                .toArray()
+                .then((items) => {
+                    res.send(items);
+                    db.close();
+                });
+        
+           
+   });
+
+   
+};
+
+exports.customAddTarget = (req, res) => {
+    MongoClient.connect(uri, async function (err, db) {
+        
+        
+
+           
+   });
+
+   
+};
+
+exports.customDeleteTarget = (req, res) => {
+    MongoClient.connect(uri, async function (err, db) {
+       
+           
+
+        
+   });
+};
+
+
