@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  node-api:
+    build: .
+    container_name: my-node-api-container
+    ports:
+      - "3001:3001" # Maps port 3001 on your host to port 3001 inside the container
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/user_db  # MongoDB connection string
+    depends_on:
+      - mongo
+    restart: always
+
+  mongo:
+    image: mongo:latest
+    container_name: mongo-container
+    ports:
+      - "27017:27017" # Exposes MongoDB's default port
+    volumes:
+      - mongo-data:/data/db  # Persists MongoDB data in a volume
+
+volumes:
+  mongo-data: # Creates a persistent volume for MongoDB data

@@ -1726,6 +1726,11 @@ exports.getInsights = (req, res) => {
         tgChannelPostCount[element.channel_username] += element.data.length;
        });
 
+       let tgChannelPPLinks = {};
+       uniqueChannelUsernames.forEach(element => {
+            tgChannelPPLinks[element] = '';
+        });
+
        let tgChannelTotalPostCount = Object.values(tgChannelPostCount).reduce((accumulator, currentValue) => accumulator + currentValue, 0);
        
 
@@ -1756,9 +1761,36 @@ exports.getInsights = (req, res) => {
         tgGroupPostCount[element.group_username] += element.group_data.length;
        });
 
+       let tgGroupPPLinks = {};
+       uniqueGroupUsernames.forEach(element => {
+            tgGroupPPLinks[element] = '';
+        });
+
+
        let tgGroupTotalPostCount = Object.values(tgGroupPostCount).reduce((accumulator, currentValue) => accumulator + currentValue, 0);
 
+        let newTgData = {};
 
+        let newGroupData = {};
+
+        uniqueGroupUsernames.forEach(item => {
+            newGroupData[item] = {
+                Posts: tgGroupPostCount[item],
+                Profile_picture: ""
+            }
+          });
+        
+        let newChannelData = {};
+        uniqueChannelUsernames.forEach(item => {
+              newChannelData[item] = {
+                  Posts: tgChannelPostCount[item],
+                  Profile_picture: ""
+              }
+            });
+
+        newTgData['channel'] = newChannelData;
+        newTgData['group'] = newGroupData;
+        
 
 
        dbo = db.db("facebook-data");
@@ -1824,6 +1856,7 @@ exports.getInsights = (req, res) => {
                     scrapingSessionsByUsername: sessionCountByTGCUsername,
                     totalPostsCount: tgChannelTotalPostCount,
                     postCountByUsername: tgChannelPostCount,
+                    profilePictureLinks: tgChannelPPLinks
                 },
                 groups:{
                     scrapingSessions: tgGroupsScSessions,
@@ -1831,7 +1864,9 @@ exports.getInsights = (req, res) => {
                     scrapingSessionsByUsername: sessionCountByTGGUsername,
                     totalPostsCount: tgGroupTotalPostCount,
                     postCountByUsername: tgGroupPostCount,
-                }
+                    profilePictureLinks: tgGroupPPLinks
+                }, 
+                newFormat: newTgData
             },
             facebook: {
                 users: {
